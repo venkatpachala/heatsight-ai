@@ -1,0 +1,26 @@
+Zone,Product_ID,Product_Name,Visits,Zone_Category,Online_Views
+A2,P002,Lays Chips,20,Warm,1238
+B1,P006,Amul Butter,20,Warm,1549
+C2,P012,Tide,20,Warm,815
+E4,P024,Tata Salt,20,Warm,1324
+D4,P019,Horlicks,18,Warm,1591
+C3,P013,Dettol,18,Warm,2308
+C1,P011,Nestle Milk,17,Warm,797
+D5,P020,Surf Excel,17,Warm,2341
+D3,P018,Bournvita,17,Warm,739
+D2,P017,Dove Shampoo,17,Warm,1549
+E3,P023,Knorr Soup,16,Warm,1202
+D1,P016,Boost,16,Warm,595
+E2,P022,Kurkure,16,Warm,2487
+A5,P005,Bru Coffee,16,Warm,1446
+A4,P004,Coca Cola 500ml,15,Warm,669
+A1,P001,Good Day Cookies,14,Warm,653
+B4,P009,Kissan Jam,14,Warm,695
+E1,P021,Ariel,14,Warm,671
+C5,P015,Tropicana Juice,13,Warm,606
+A3,P003,Parle-G Biscuits,12,Warm,636
+B2,P007,Pepsi,12,Warm,2251
+E5,P025,Sunfeast Pasta,12,Warm,586
+B3,P008,Maggi Noodles,11,Warm,616
+C4,P014,Pears Soap,9,Cold,895
+B5,P010,Colgate Paste,7,Cold,841
