@@ -1,26 +1,101 @@
 Product_ID,Product_Name,Online_Views
-P001,Good Day Cookies,653
-P002,Lays Chips,1238
-P003,Parle-G Biscuits,636
-P004,Coca Cola 500ml,669
-P005,Bru Coffee,1446
-P006,Amul Butter,1549
-P007,Pepsi,2251
-P008,Maggi Noodles,616
-P009,Kissan Jam,695
-P010,Colgate Paste,841
-P011,Nestle Milk,797
-P012,Tide,815
-P013,Dettol,2308
-P014,Pears Soap,895
-P015,Tropicana Juice,606
-P016,Boost,595
-P017,Dove Shampoo,1549
-P018,Bournvita,739
-P019,Horlicks,1591
-P020,Surf Excel,2341
-P021,Ariel,671
-P022,Kurkure,2487
-P023,Knorr Soup,1202
-P024,Tata Salt,1324
-P025,Sunfeast Pasta,586
+P001,Paneer 200g,557
+P002,Baby Romper,1454
+P003,Tata Salt 1kg,1430
+P004,MDH Chana Masala,801
+P005,Smart LED TV 32inch,1995
+P006,Maggi Noodles 6-Pack,530
+P007,Laptop Bag,1896
+P008,Formal Shirt Men,1423
+P009,Whisper Sanitary Pads,1023
+P010,Pepsi 1.5L,1022
+P011,Godrej No.1 Soap,3200
+P012,Lifebuoy Total Soap,1971
+P013,Close-up Toothpaste Gel,1330
+P014,Fortune Refined Oil 1L,3492
+P015,Ariel Laundry Pods,1099
+P016,Cricket Bat Kids,3914
+P017,Head & Shoulders Shampoo,1541
+P018,Tropicana Orange Juice 1L,1878
+P019,Rice Basmati 5kg,6691
+P020,Lux Jasmine Soap,1143
+P021,Sunfeast Yippee Noodles,1563
+P022,Colgate Toothpaste 150g,5413
+P023,Lizol Floor Cleaner 1L,1288
+P024,Patanjali Atta 5kg,1660
+P025,Vaseline Intensive Care,1465
+P026,Iron Box Philips,1615
+P027,Bread Loaf Brown,5006
+P028,Nescafe Classic Coffee 100g,5430
+P029,Clinic Plus Shampoo,5826
+P030,Dettol Antiseptic Liquid,584
+P031,Sandals Bata,1604
+P032,Bananas Dozen,7969
+P033,Ethnic Kurti Women,1506
+P034,Jaggery 500g,1566
+P035,Men's T-Shirt Basic,3549
+P036,Bournvita 500g,2769
+P037,Ponds Cold Cream,6143
+P038,Vim Dishwash Liquid,3582
+P039,Oral-B Toothbrush,1682
+P040,Oats 1kg,741
+P041,Surf Excel Detergent 1kg,555
+P042,Ceiling Fan Usha,1155
+P043,Bingo Mad Angles,1214
+P044,Barbie Doll,5954
+P045,Kurkure Masala Munch,1734
+P046,Corn Flakes 500g,3362
+P047,Tomatoes 500g,4179
+P048,Knorr Tomato Soup,1965
+P049,Curd 400g,945
+P050,Boost Health Drink,4909
+P051,Kids' School Uniform,4356
+P052,Cadbury Dairy Milk 100g,863
+P053,Horlicks Classic,7614
+P054,Dove Shampoo 180ml,1691
+P055,Potatoes 1kg,7915
+P056,Hot Wheels Car Set,1982
+P057,Headphones Boat,1727
+P058,Vinegar 500ml,4551
+P059,Sport Shoes Adidas,6177
+P060,Amul Milk 1L Pouch,1034
+P061,Fresh Apples 1kg,1692
+P062,Extension Board 6-socket,857
+P063,Garnier Face Wash,1179
+P064,Amul Butter 500g,530
+P065,Himalaya Neem Face Pack,632
+P066,Lego Classic Box,1503
+P067,Parle-G Biscuits Pack,1111
+P068,USB Cable Charger,1919
+P069,Football Size 5,701
+P070,Eggs 6-pack,1385
+P071,Lays Chips Family,1214
+P072,Hawkins Cooker 5L,4223
+P073,Sugar 1kg,936
+P074,Prestige Pressure Cooker 3L,1039
+P075,Everest Garam Masala,6031
+P076,Nivea Body Lotion,1085
+P077,Peanut Butter 500g,1907
+P078,Kissan Mixed Fruit Jam,1047
+P079,Bluetooth Speaker JBL,769
+P080,Onions 1kg,1119
+P081,Dal Arhar 1kg,1258
+P082,Tea Powder 500g,1875
+P083,Women's Jeans Denim,960
+P084,Good Day Cashew Cookies,1220
+P085,Duracell AA Batteries 4-pack,1504
+P086,Frooti Mango Drink 1L,5166
+P087,Underwear Multi-pack,1920
+P088,Pears Transparent Soap,1893
+P089,Wheat Flour 10kg,1255
+P090,Fair & Lovely Cream,5250
+P091,Power Bank MI,936
+P092,Coca Cola 2L,3980
+P093,Britannia Good Day Butter,7755
+P094,Socks Multi-pack,2941
+P095,Bajaj Mixer Grinder,1049
+P096,KitKat Chocolate Bar,1750
+P097,Printer Ink Cartridge,1143
+P098,Listerine Mouthwash,870
+P099,Philips LED Bulb,6322
+P100,Dabur Honey 500g,1109
