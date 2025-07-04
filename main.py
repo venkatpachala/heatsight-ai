@@ -1,4 +1,3 @@
-# main.py (UPDATED for Pure Black Background Dark Mode UI/UX)
 import streamlit as st
 import pandas as pd
 import seaborn as sns
@@ -7,7 +6,6 @@ import numpy as np
 import os
 import json
 
-# --- LangChain & Gemini Imports ---
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage
@@ -15,7 +13,6 @@ from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.memory import ConversationBufferMemory
 
-# --- Import our custom HeatSight tools ---
 from heatsight_tools import (
     get_zone_performance,
     get_product_insights,
@@ -24,28 +21,23 @@ from heatsight_tools import (
     list_hot_cold_zones
 )
 
-# Load environment variables (this should be at the very top of your script)
 load_dotenv()
 
-# --- Streamlit Page Configuration ---
 st.set_page_config(
     layout="wide",
     page_title="HeatSight: Walmart Omnichannel Insights",
     initial_sidebar_state="expanded"
 )
 
-# --- Custom CSS for Aesthetic & Advanced UI (PURE BLACK DARK MODE) ---
 st.markdown("""
 <style>
-    /* Main container styling - PURE BLACK */
     .stApp {
-        background-color: #000000; /* Pure black background */
-        color: #f0f0f0; /* Very light gray text */
+        background-color: #000000;
+        color: #f0f0f0;
     }
 
-    /* Header styling */
     h1, h2, h3, h4, h5, h6 {
-        color: #007ACC; /* Walmart blue accent for headers */
+        color: #007ACC;
         font-family: 'Segoe UI', sans-serif;
         font-weight: 600;
     }
@@ -53,20 +45,18 @@ st.markdown("""
         font-size: 2.5em;
         text-align: center;
         padding-bottom: 20px;
-        border-bottom: 2px solid #007ACC; /* Walmart blue accent */
+        border-bottom: 2px solid #007ACC;
         margin-bottom: 30px;
-        color: #007ACC; /* Darker blue for main title */
+        color: #007ACC;
     }
 
-    /* Markdown styling for overall text */
     .stMarkdown {
         font-family: 'Arial', sans-serif;
         font-size: 1.1em;
         line-height: 1.6;
-        color: #f0f0f0; /* Ensure markdown text is light */
+        color: #f0f0f0;
     }
 
-    /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 24px;
     }
@@ -74,7 +64,7 @@ st.markdown("""
     .stTabs [data-baseweb="tab"] {
         height: 50px;
         white-space: nowrap;
-        background-color: #1a1a1a; /* Very dark gray for tab background */
+        background-color: #1a1a1a;
         border-radius: 8px 8px 0 0;
         gap: 10px;
         padding-top: 10px;
@@ -82,7 +72,7 @@ st.markdown("""
         padding-left: 20px;
         padding-right: 20px;
         font-size: 1.1em;
-        color: #b0b0b0; /* Lighter gray for inactive tab text */
+        color: #b0b0b0;
         font-weight: bold;
     }
 
@@ -92,30 +82,28 @@ st.markdown("""
     }
 
     .stTabs [data-baseweb="tab-list"] button:hover {
-        background-color: #2a2a2a; /* Slightly lighter hover */
+        background-color: #2a2a2a;
         color: #007ACC;
     }
 
     .stTabs [data-baseweb="tab-list"] button[aria-selected="true"] {
-        background-color: #007ACC; /* Selected tab background (Walmart blue) */
-        color: white; /* Selected tab text */
-        border-bottom: 3px solid #FFC300; /* Accent line for selected tab (Walmart yellow) */
+        background-color: #007ACC;
+        color: white;
+        border-bottom: 3px solid #FFC300;
     }
-    /* Card-like containers for sections */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
         padding-left: 3rem;
         padding-right: 3rem;
-        background-color: #121212; /* Darker gray for card background */
+        background-color: #121212;
         border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Darker shadow for pure black mode */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
         margin-bottom: 30px;
     }
 
-    /* Sidebar styling */
     .stSidebar {
-        background-image: linear-gradient(to bottom, #007ACC, #014E7B); /* Walmart blue gradient */
+        background-image: linear-gradient(to bottom, #007ACC, #014E7B);
         color: white;
         padding-top: 30px;
     }
@@ -129,80 +117,73 @@ st.markdown("""
         margin-left: 5%;
         margin-right: 5%;
         border-radius: 10px;
-        background-color: #FFC300; /* Walmart yellow */
-        color: #014E7B; /* Dark blue text on button */
+        background-color: #FFC300;
+        color: #014E7B;
         font-weight: bold;
     }
 
-    /* Chat messages styling */
     .stChatMessage {
         border-radius: 10px;
         padding: 10px 15px;
         margin-bottom: 10px;
     }
     .stChatMessage.st-ai-message {
-        background-color: #222222; /* Darker gray for AI messages */
+        background-color: #222222;
         border-left: 5px solid #007ACC;
-        color: #f0f0f0; /* Light text */
+        color: #f0f0f0;
     }
     .stChatMessage.st-human-message {
-        background-color: #1a1a1a; /* Even darker for human messages */
+        background-color: #1a1a1a;
         border-right: 5px solid #007ACC;
         text-align: right;
         margin-left: auto;
-        color: #f0f0f0; /* Light text */
+        color: #f0f0f0;
     }
-    /* Adjust chat message alignment for internal content */
     .stChatMessage.st-human-message > div > div > div > div {
         text-align: right;
     }
 
-    /* Metric cards styling for dark mode */
     [data-testid="stMetric"] {
-        background-color: #121212; /* Same as block-container for consistency */
+        background-color: #121212;
         border-radius: 10px;
         padding: 15px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         color: #f0f0f0;
     }
     [data-testid="stMetric"] label {
-        color: #b0b0b0; /* Lighter label for metrics */
+        color: #b0b0b0;
     }
     [data-testid="stMetric"] .stMetricValue {
-        color: #FFC300; /* Accent color for metric values */
+        color: #FFC300;
     }
     [data-testid="stMetric"] .stMetricDelta {
-        color: #4CAF50; /* Green for positive delta */
+        color: #4CAF50;
     }
     [data-testid="stMetric"] .stMetricDelta[data-testid="stMetricDelta"] {
-        color: #F44336; /* Red for negative delta */
+        color: #F44336;
     }
 
-    /* Adjust plot background colors for dark mode */
     .stPlotlyChart {
-        background-color: #121212; /* Adjust if plots appear with white backgrounds */
+        background-color: #121212;
         border-radius: 10px;
-        overflow: hidden; /* Ensure corners are rounded */
+        overflow: hidden;
     }
     .stPlotlyChart .modebar-container {
-        background-color: #121212 !important; /* Ensure Plotly modebar is dark */
+        background-color: #121212 !important;
     }
 
 </style>
 """, unsafe_allow_html=True)
 
 
-# --- Initialize Session State for Chat History ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# --- Helper Function to Display Messages in Chat ---
 def display_message(message):
     message_type_class = "st-ai-message" if message.type == "ai" else "st-human-message"
     with st.chat_message(message.type, avatar="🤖" if message.type == "ai" else "🧑‍💻"):
         st.markdown(message.content, unsafe_allow_html=True)
 
-# --- Sidebar Content ---
 with st.sidebar:
     st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Walmart_logo_2017.svg/1200px-Walmart_logo_2017.svg.png", width=200)
     st.title("💡 HeatSight Dashboard")
@@ -218,7 +199,6 @@ with st.sidebar:
     if st.button("Refresh Data"):
         st.experimental_rerun()
 
-# --- Main Application Layout ---
 st.title("🛒 HeatSight: Revolutionizing Walmart Retail with Omnichannel Insights")
 st.markdown("""
 <p style='text-align: center; font-size: 1.2em; color: #f0f0f0;'>
@@ -226,7 +206,6 @@ Welcome to HeatSight, an innovative solution for Walmart's Sparkathon! This plat
 </p>
 """, unsafe_allow_html=True)
 
-# Create tabs for better navigation
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊 Dashboard Overview",
     "🔥 In-Store Heatmap",
@@ -235,7 +214,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🤖 ShelfSense AI Agent"
 ])
 
-# --- Tab 1: Dashboard Overview ---
 with tab1:
     st.header("📊 Dashboard Overview: Key Metrics")
     st.markdown("A quick glance at the core operational metrics derived from our simulated data.")
@@ -271,7 +249,6 @@ with tab1:
     st.image("https://media.istockphoto.com/id/1149725807/photo/young-african-woman-using-her-smartphone-in-grocery-store.jpg?s=612x612&w=0&k=20&c=p-bT69k32h6y6-iS9zYk8D5eM5_B-Q1oTf4S6Z5g2-U=", caption="Connecting Online & Offline Customer Journeys", use_column_width=True)
 
 
-# --- Tab 2: In-Store Customer Movement Heatmap ---
 with tab2:
     st.header("🔥 In-Store Customer Movement Heatmap")
     st.markdown("""
@@ -296,13 +273,13 @@ with tab2:
         fig, ax = plt.subplots(figsize=(12, 10))
         sns.heatmap(heatmap_grid, annot=True, fmt="d", cmap="YlOrRd",
                     xticklabels=cols, yticklabels=rows, linewidths=.5, linecolor='lightgray', ax=ax)
-        ax.set_title("Heatmap of In-Store Zone Visits", fontsize=16, color='#f0f0f0') # Title color
-        ax.set_xlabel("Shelf Column", fontsize=12, color='#f0f0f0') # Label color
-        ax.set_ylabel("Shelf Row", fontsize=12, color='#f0f0f0') # Label color
-        ax.tick_params(axis='x', rotation=0, colors='#e0e0e0') # Tick label color
-        ax.tick_params(axis='y', rotation=0, colors='#e0e0e0') # Tick label color
-        ax.set_facecolor('#121212') # Plot background color
-        fig.patch.set_facecolor('#121212') # Figure background color
+        ax.set_title("Heatmap of In-Store Zone Visits", fontsize=16, color='#f0f0f0')
+        ax.set_xlabel("Shelf Column", fontsize=12, color='#f0f0f0')
+        ax.set_ylabel("Shelf Row", fontsize=12, color='#f0f0f0')
+        ax.tick_params(axis='x', rotation=0, colors='#e0e0e0')
+        ax.tick_params(axis='y', rotation=0, colors='#e0e0e0')
+        ax.set_facecolor('#121212')
+        fig.patch.set_facecolor('#121212')
         plt.tight_layout()
         st.pyplot(fig)
 
@@ -312,7 +289,6 @@ with tab2:
         st.error(f"Error generating heatmap: {e}")
 
 
-# --- Tab 3: Combined Omnichannel Insights ---
 with tab3:
     st.header("📈 Omnichannel Insights: Bridging Digital & Physical")
     st.markdown("""
@@ -330,14 +306,14 @@ with tab3:
             st.write("Breakdown of Hot vs. Cold Zones by Count:")
             zone_category_counts = final_insights_df["Zone_Category"].value_counts()
             fig_cat, ax_cat = plt.subplots(figsize=(6, 4))
-            zone_category_counts.plot(kind='bar', ax=ax_cat, color=['#FFC300', '#007ACC']) # Accent colors
+            zone_category_counts.plot(kind='bar', ax=ax_cat, color=['#FFC300', '#007ACC'])
             ax_cat.set_title("Distribution of Hot vs. Cold Zones", color='#f0f0f0')
             ax_cat.set_ylabel("Number of Zones", color='#f0f0f0')
             ax_cat.set_xlabel("Zone Category", color='#f0f0f0')
             ax_cat.tick_params(axis='x', rotation=0, colors='#e0e0e0')
             ax_cat.tick_params(axis='y', colors='#e0e0e0')
-            ax_cat.set_facecolor('#121212') # Plot background
-            fig_cat.patch.set_facecolor('#121212') # Figure background
+            ax_cat.set_facecolor('#121212')
+            fig_cat.patch.set_facecolor('#121212')
             st.pyplot(fig_cat)
         
         with col_dist2:
@@ -350,7 +326,6 @@ with tab3:
         st.error("Error: 'insights/final_product_insights.csv' not found. Please run `final_insights.py`.")
 
 
-# --- Tab 4: Smart Relocation Plan ---
 with tab4:
     st.header("📦 Smart Relocation Plan: Actionable Optimization")
     st.markdown("""
@@ -374,7 +349,6 @@ with tab4:
         st.error("Error: 'insights/relocation_plan.csv' not found. Please run `relocation_engine.py`.")
 
 
-# --- Tab 5: ShelfSense AI Agent ---
 with tab5:
     st.header("🤖 ShelfSense AI Agent: Your Smart Retail Co-Pilot")
     st.markdown("""
@@ -382,7 +356,6 @@ with tab5:
     It can analyze data, explain trends, and provide recommendations using its intelligent tools and memory.
     """)
 
-    # Define the tools available to the agent
     tools = [
         get_zone_performance,
         get_product_insights,
@@ -391,11 +364,9 @@ with tab5:
         list_hot_cold_zones
     ]
 
-    # Initialize the LLM
     try:
         llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.5)
         
-        # --- Agent Prompt ---
         prompt = ChatPromptTemplate.from_messages(
             [
                 (

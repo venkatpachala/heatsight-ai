@@ -1,19 +1,17 @@
-# heatsight_tools.py
 import pandas as pd
 import json
 import os
-from langchain.tools import tool # <--- Ensure this import and decorator is here!
+from langchain.tools import tool 
 
-# --- Constants for File Paths ---
 FINAL_INSIGHTS_PATH = "insights/final_product_insights.csv"
 RELOCATION_PLAN_PATH = "insights/relocation_plan.csv"
 MEMORY_FILE_PATH = "agent_memory/decision_log.json"
 
-# --- Helper Functions to Load Data (Internal, not directly exposed as tools) ---
+# Loading the Data
 def _load_final_insights_df():
     if os.path.exists(FINAL_INSIGHTS_PATH):
         return pd.read_csv(FINAL_INSIGHTS_PATH)
-    return pd.DataFrame() # Return empty if not found
+    return pd.DataFrame()
 
 def _load_relocation_plan_df():
     if os.path.exists(RELOCATION_PLAN_PATH):
@@ -30,7 +28,6 @@ def _load_decision_log():
                 return []
     return []
 
-# --- LangChain Tools for ShelfSense Agent ---
 
 @tool
 def get_zone_performance(zone_id: str) -> str:
@@ -47,11 +44,9 @@ def get_zone_performance(zone_id: str) -> str:
     if zone_data.empty:
         return f"No data found for zone '{zone_id}'. Please provide a valid zone ID (e.g., 'A1')."
     
-    # Summarize zone-level info
     zone_category = zone_data['Zone_Category'].iloc[0]
-    total_zone_visits = zone_data['Visits'].sum() # Sum visits for all products in that zone
+    total_zone_visits = zone_data['Visits'].sum() 
     
-    # List products in the zone
     products_in_zone = zone_data[['Product_Name', 'Visits', 'Online_Views']].to_dict(orient='records')
     
     response = f"Zone {zone_id.upper()} is categorized as **{zone_category}** with a total of **{total_zone_visits} in-store visits**."
@@ -77,7 +72,7 @@ def get_product_insights(product_name: str) -> str:
         return f"No product found matching '{product_name}'. Please try a more precise name."
     
     # If multiple matches, take the first or ask for clarification
-    product_data = product_data.iloc[0] # Take the first match for simplicity
+    product_data = product_data.iloc[0] 
     
     response = (
         f"Insights for **{product_data['Product_Name']}**:\n"
