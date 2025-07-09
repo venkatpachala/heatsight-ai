@@ -13,13 +13,16 @@ from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.memory import ConversationBufferMemory
 
+# --- UPDATED IMPORTS FOR HEATSIHGT_TOOLS ---
 from heatsight_tools import (
     get_zone_performance,
     get_product_insights,
-    get_relocation_recommendations,
-    get_past_relocation_outcome,
-    list_hot_cold_zones
+    # Corrected name: get_relocation_recommendations -> get_relocation_plan_summary
+    get_relocation_plan_summary,
+    # NEW TOOL: record_relocation_outcome
+    record_relocation_outcome
 )
+# --- END UPDATED IMPORTS ---
 
 load_dotenv()
 
@@ -224,7 +227,8 @@ with tab1:
     col_kpi1.metric("Total Store Zones", total_zones)
 
     try:
-        final_insights_df = pd.read_csv("insights/final_product_insights.csv")
+        # Corrected data path here as well if needed for dashboard display
+        final_insights_df = pd.read_csv("insights/final_product_insights.csv") 
         hot_zones_count = final_insights_df[final_insights_df["Zone_Category"] == "Hot"]["Zone"].nunique()
         cold_zones_count = final_insights_df[final_insights_df["Zone_Category"] == "Cold"]["Zone"].nunique()
         col_kpi2.metric("Hot Zones 🔥", hot_zones_count, delta=f"{hot_zones_count/total_zones:.1%}")
@@ -258,7 +262,8 @@ with tab2:
     """, unsafe_allow_html=True)
 
     try:
-        movement_df = pd.read_csv("data/movements.csv")
+        # Assuming movements.csv is still in 'data/'
+        movement_df = pd.read_csv("data/movements.csv") 
         zone_counts = movement_df["Zone"].value_counts().to_dict()
 
         rows = [chr(ord('A') + i) for i in range(10)]
@@ -297,7 +302,8 @@ with tab3:
     """)
 
     try:
-        final_insights_df = pd.read_csv("insights/final_product_insights.csv")
+        # Corrected data path here as well for dashboard display
+        final_insights_df = pd.read_csv("insights/final_product_insights.csv") 
         st.dataframe(final_insights_df)
 
         st.subheader("Zone Category Distribution")
@@ -334,7 +340,8 @@ with tab4:
     """)
 
     try:
-        relocation_df = pd.read_csv("insights/relocation_plan.csv")
+        # Assuming relocation_plan.csv is in 'insights/'
+        relocation_df = pd.read_csv("insights/relocation_plan.csv") 
         
         if not relocation_df.empty:
             st.dataframe(relocation_df)
@@ -350,19 +357,22 @@ with tab4:
 
 
 with tab5:
-    st.header("🤖 ShelfSense AI Agent: Your Smart Retail Co-Pilot")
+    st.header("ShelfSense AI Agent: Your Smart Retail Co-Pilot")
     st.markdown("""
     Ask ShelfSense anything about store performance, product insights, or relocation plans.
     It can analyze data, explain trends, and provide recommendations using its intelligent tools and memory.
     """)
 
+    # --- UPDATED TOOLS LIST ---
     tools = [
         get_zone_performance,
         get_product_insights,
-        get_relocation_recommendations,
-        get_past_relocation_outcome,
-        list_hot_cold_zones
+        # Corrected tool name to match heatsight_tools.py
+        get_relocation_plan_summary,
+        # NEW TOOL ADDED
+        record_relocation_outcome
     ]
+    # --- END UPDATED TOOLS LIST ---
 
     try:
         llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.5)
@@ -377,8 +387,13 @@ with tab5:
                     "Always be concise, precise, and polite. If you need more information to answer a question accurately, ask follow-up questions (e.g., 'Could you please specify the product name?' or 'Which zone are you asking about?'). "
                     "When answering about relocation plans, clearly mention the product to move in, its online views, its current cold zone, and the suggested hot zone it should move to (by replacing another product). "
                     "When asked about past outcomes, use your memory tool (`get_past_relocation_outcome`) to find specific results and state the simulated outcome clearly. "
+                    # IMPORTANT: Add a specific instruction for the new tool
+                    "You can also record simulated outcomes of relocation actions using the `record_relocation_outcome` tool. Use this tool when the user explicitly asks you to 'log' or 'record' a simulated outcome for a specific product move with its details. "
                     "If you cannot find relevant information with your tools, state that clearly and suggest what information you can provide instead. "
                     "Use emojis appropriately to make your responses more engaging where suitable (e.g., 🔥 for hot, ❄️ for cold, 📦 for relocation)."
+                    "When asked 'why' or to 'explain' an observation (e.g., why a zone is hot/cold, why a product is recommended for relocation), provide a detailed, data-driven explanation using the information from your tools. For zone categories, explain the criteria (visits, online views) that led to that classification. For relocation recommendations, explain the reasoning (e.g., cold zone product moving to hot zone, replacing underperforming product)."
+                "Strive to provide context and quantitative support for your explanations. For example, if a zone is 'Cold', mention its visit count compared to others."
+
                 ),
                 MessagesPlaceholder(variable_name="chat_history"),
                 ("human", "{input}"),
@@ -390,7 +405,7 @@ with tab5:
         agent = create_tool_calling_agent(llm, tools, prompt)
         agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, memory=conversational_memory)
 
-        st.info("ShelfSense is ready to assist! Try asking: 'What are the top relocation recommendations?' or 'Tell me about product Formal Shirt Men.'")
+        st.info("ShelfSense is ready to assist! Try asking: 'What are the top relocation recommendations?' or 'Tell me about product Formal Shirt Men.' You can also try: 'Record that Dettol was moved from A1 to B5 and sales increased by 10%.'")
 
         for msg in st.session_state.messages:
             display_message(msg)

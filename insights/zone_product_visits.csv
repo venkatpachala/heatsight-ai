@@ -1,101 +1,101 @@
 Zone,Product_ID,Product_Name,Visits,Zone_Category
-A1,P001,Paneer 200g,50,Hot
-A2,P002,Baby Romper,40,Cold
-A3,P003,Tata Salt 1kg,40,Cold
-A4,P004,MDH Chana Masala,35,Cold
-A5,P005,Smart LED TV 32inch,36,Cold
-A6,P006,Maggi Noodles 6-Pack,36,Cold
-A7,P007,Laptop Bag,42,Hot
-A8,P008,Formal Shirt Men,41,Hot
-A9,P009,Whisper Sanitary Pads,47,Hot
-A10,P010,Pepsi 1.5L,50,Hot
-B1,P011,Godrej No.1 Soap,33,Cold
-B2,P012,Lifebuoy Total Soap,47,Hot
-B3,P013,Close-up Toothpaste Gel,35,Cold
-B4,P014,Fortune Refined Oil 1L,46,Hot
-B5,P015,Ariel Laundry Pods,43,Hot
-B6,P016,Cricket Bat Kids,24,Cold
-B7,P017,Head & Shoulders Shampoo,32,Cold
-B8,P018,Tropicana Orange Juice 1L,33,Cold
-B9,P019,Rice Basmati 5kg,47,Hot
-B10,P020,Lux Jasmine Soap,44,Hot
-C1,P021,Sunfeast Yippee Noodles,50,Hot
-C2,P022,Colgate Toothpaste 150g,44,Hot
-C3,P023,Lizol Floor Cleaner 1L,38,Cold
-C4,P024,Patanjali Atta 5kg,38,Cold
-C5,P025,Vaseline Intensive Care,47,Hot
-C6,P026,Iron Box Philips,38,Cold
-C7,P027,Bread Loaf Brown,37,Cold
-C8,P028,Nescafe Classic Coffee 100g,38,Cold
-C9,P029,Clinic Plus Shampoo,45,Hot
-C10,P030,Dettol Antiseptic Liquid,37,Cold
-D1,P031,Sandals Bata,43,Hot
-D2,P032,Bananas Dozen,39,Cold
-D3,P033,Ethnic Kurti Women,42,Hot
-D4,P034,Jaggery 500g,50,Hot
-D5,P035,Men's T-Shirt Basic,37,Cold
-D6,P036,Bournvita 500g,38,Cold
-D7,P037,Ponds Cold Cream,36,Cold
-D8,P038,Vim Dishwash Liquid,43,Hot
-D9,P039,Oral-B Toothbrush,42,Hot
-D10,P040,Oats 1kg,47,Hot
-E1,P041,Surf Excel Detergent 1kg,34,Cold
-E2,P042,Ceiling Fan Usha,42,Hot
-E3,P043,Bingo Mad Angles,47,Hot
-E4,P044,Barbie Doll,41,Hot
-E5,P045,Kurkure Masala Munch,50,Hot
-E6,P046,Corn Flakes 500g,35,Cold
-E7,P047,Tomatoes 500g,36,Cold
-E8,P048,Knorr Tomato Soup,44,Hot
-E9,P049,Curd 400g,53,Hot
-E10,P050,Boost Health Drink,43,Hot
-F1,P051,Kids' School Uniform,45,Hot
-F2,P052,Cadbury Dairy Milk 100g,44,Hot
-F3,P053,Horlicks Classic,36,Cold
-F4,P054,Dove Shampoo 180ml,39,Cold
-F5,P055,Potatoes 1kg,42,Hot
-F6,P056,Hot Wheels Car Set,43,Hot
-F7,P057,Headphones Boat,38,Cold
-F8,P058,Vinegar 500ml,39,Cold
-F9,P059,Sport Shoes Adidas,35,Cold
-F10,P060,Amul Milk 1L Pouch,49,Hot
-G1,P061,Fresh Apples 1kg,29,Cold
-G2,P062,Extension Board 6-socket,40,Cold
-G3,P063,Garnier Face Wash,38,Cold
-G4,P064,Amul Butter 500g,45,Hot
-G5,P065,Himalaya Neem Face Pack,41,Hot
-G6,P066,Lego Classic Box,42,Hot
-G7,P067,Parle-G Biscuits Pack,38,Cold
-G8,P068,USB Cable Charger,41,Hot
-G9,P069,Football Size 5,45,Hot
-G10,P070,Eggs 6-pack,43,Hot
-H1,P071,Lays Chips Family,48,Hot
-H2,P072,Hawkins Cooker 5L,50,Hot
-H3,P073,Sugar 1kg,50,Hot
-H4,P074,Prestige Pressure Cooker 3L,30,Cold
-H5,P075,Everest Garam Masala,35,Cold
-H6,P076,Nivea Body Lotion,42,Hot
-H7,P077,Peanut Butter 500g,40,Cold
-H8,P078,Kissan Mixed Fruit Jam,29,Cold
-H9,P079,Bluetooth Speaker JBL,39,Cold
-H10,P080,Onions 1kg,36,Cold
-I1,P081,Dal Arhar 1kg,34,Cold
-I2,P082,Tea Powder 500g,38,Cold
-I3,P083,Women's Jeans Denim,35,Cold
-I4,P084,Good Day Cashew Cookies,45,Hot
-I5,P085,Duracell AA Batteries 4-pack,47,Hot
-I6,P086,Frooti Mango Drink 1L,39,Cold
-I7,P087,Underwear Multi-pack,42,Hot
-I8,P088,Pears Transparent Soap,38,Cold
-I9,P089,Wheat Flour 10kg,44,Hot
-I10,P090,Fair & Lovely Cream,32,Cold
-J1,P091,Power Bank MI,37,Cold
-J2,P092,Coca Cola 2L,43,Hot
-J3,P093,Britannia Good Day Butter,46,Hot
-J4,P094,Socks Multi-pack,52,Hot
-J5,P095,Bajaj Mixer Grinder,42,Hot
-J6,P096,KitKat Chocolate Bar,38,Cold
-J7,P097,Printer Ink Cartridge,32,Cold
+A1,P001,Printer Ink Cartridge,41,Hot
+A2,P002,Tea Powder 500g,38,Cold
+A3,P003,Horlicks Classic,36,Cold
+A4,P004,Clinic Plus Shampoo,41,Hot
+A5,P005,Kids' School Uniform,39,Hot
+A6,P006,Head & Shoulders Shampoo,30,Cold
+A7,P007,Barbie Doll,39,Hot
+A8,P008,Ariel Laundry Pods,51,Hot
+A9,P009,Coca Cola 2L,29,Cold
+A10,P010,Bajaj Mixer Grinder,32,Cold
+B1,P011,Vaseline Intensive Care,44,Hot
+B2,P012,Godrej No.1 Soap,40,Hot
+B3,P013,Sunfeast Yippee Noodles,44,Hot
+B4,P014,Lays Chips Family,37,Cold
+B5,P015,Eggs 6-pack,36,Cold
+B6,P016,Nivea Body Lotion,32,Cold
+B7,P017,Fortune Refined Oil 1L,49,Hot
+B8,P018,Lego Classic Box,57,Hot
+B9,P019,Nescafe Classic Coffee 100g,40,Hot
+B10,P020,Underwear Multi-pack,39,Hot
+C1,P021,Surf Excel Detergent 1kg,34,Cold
+C2,P022,MDH Chana Masala,38,Cold
+C3,P023,Dettol Antiseptic Liquid,34,Cold
+C4,P024,Kurkure Masala Munch,41,Hot
+C5,P025,Peanut Butter 500g,31,Cold
+C6,P026,Bread Loaf Brown,43,Hot
+C7,P027,Bingo Mad Angles,39,Hot
+C8,P028,Garnier Face Wash,47,Hot
+C9,P029,Curd 400g,46,Hot
+C10,P030,Dal Arhar 1kg,37,Cold
+D1,P031,Football Size 5,37,Cold
+D2,P032,Amul Milk 1L Pouch,36,Cold
+D3,P033,Jaggery 500g,45,Hot
+D4,P034,Socks Multi-pack,35,Cold
+D5,P035,Ponds Cold Cream,43,Hot
+D6,P036,Maggi Noodles 6-Pack,39,Hot
+D7,P037,Bluetooth Speaker JBL,39,Hot
+D8,P038,Bournvita 500g,39,Hot
+D9,P039,Hawkins Cooker 5L,37,Cold
+D10,P040,Amul Butter 500g,42,Hot
+E1,P041,Britannia Good Day Butter,34,Cold
+E2,P042,Potatoes 1kg,36,Cold
+E3,P043,Frooti Mango Drink 1L,28,Cold
+E4,P044,Kissan Mixed Fruit Jam,41,Hot
+E5,P045,Himalaya Neem Face Pack,44,Hot
+E6,P046,Women's Jeans Denim,39,Hot
+E7,P047,Tropicana Orange Juice 1L,28,Cold
+E8,P048,Power Bank MI,33,Cold
+E9,P049,Vim Dishwash Liquid,35,Cold
+E10,P050,Iron Box Philips,46,Hot
+F1,P051,Patanjali Atta 5kg,33,Cold
+F2,P052,Cadbury Dairy Milk 100g,36,Cold
+F3,P053,Hot Wheels Car Set,35,Cold
+F4,P054,Rice Basmati 5kg,38,Cold
+F5,P055,Sugar 1kg,29,Cold
+F6,P056,Whisper Sanitary Pads,38,Cold
+F7,P057,Vinegar 500ml,40,Hot
+F8,P058,Fresh Apples 1kg,39,Hot
+F9,P059,Headphones Boat,51,Hot
+F10,P060,Everest Garam Masala,29,Cold
+G1,P061,Tata Salt 1kg,38,Cold
+G2,P062,Lifebuoy Total Soap,30,Cold
+G3,P063,Wheat Flour 10kg,42,Hot
+G4,P064,Pears Transparent Soap,47,Hot
+G5,P065,Oats 1kg,34,Cold
+G6,P066,Dabur Honey 500g,51,Hot
+G7,P067,Close-up Toothpaste Gel,44,Hot
+G8,P068,Men's T-Shirt Basic,46,Hot
+G9,P069,Extension Board 6-socket,44,Hot
+G10,P070,Onions 1kg,43,Hot
+H1,P071,Formal Shirt Men,36,Cold
+H2,P072,Colgate Toothpaste 150g,38,Cold
+H3,P073,Ethnic Kurti Women,31,Cold
+H4,P074,Ceiling Fan Usha,38,Cold
+H5,P075,Sport Shoes Adidas,43,Hot
+H6,P076,Bananas Dozen,41,Hot
+H7,P077,Duracell AA Batteries 4-pack,40,Hot
+H8,P078,Boost Health Drink,33,Cold
+H9,P079,Dove Shampoo 180ml,38,Cold
+H10,P080,Paneer 200g,28,Cold
+I1,P081,Parle-G Biscuits Pack,46,Hot
+I2,P082,Philips LED Bulb,36,Cold
+I3,P083,Laptop Bag,46,Hot
+I4,P084,Lux Jasmine Soap,41,Hot
+I5,P085,Cricket Bat Kids,42,Hot
+I6,P086,Sandals Bata,31,Cold
+I7,P087,Lizol Floor Cleaner 1L,36,Cold
+I8,P088,Smart LED TV 32inch,35,Cold
+I9,P089,Good Day Cashew Cookies,42,Hot
+I10,P090,USB Cable Charger,39,Hot
+J1,P091,Knorr Tomato Soup,40,Hot
+J2,P092,Prestige Pressure Cooker 3L,35,Cold
+J3,P093,Tomatoes 500g,35,Cold
+J4,P094,Baby Romper,41,Hot
+J5,P095,Corn Flakes 500g,40,Hot
+J6,P096,Oral-B Toothbrush,44,Hot
+J7,P097,Fair & Lovely Cream,42,Hot
 J8,P098,Listerine Mouthwash,42,Hot
-J9,P099,Philips LED Bulb,31,Cold
-J10,P100,Dabur Honey 500g,45,Hot
+J9,P099,Pepsi 1.5L,40,Hot
+J10,P100,KitKat Chocolate Bar,40,Hot
