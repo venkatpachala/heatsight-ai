@@ -20,7 +20,8 @@ from heatsight_tools import (
     # Corrected name: get_relocation_recommendations -> get_relocation_plan_summary
     get_relocation_plan_summary,
     # NEW TOOL: record_relocation_outcome
-    record_relocation_outcome
+    record_relocation_outcome,
+    explain_relocation_reason
 )
 # --- END UPDATED IMPORTS ---
 
@@ -370,7 +371,8 @@ with tab5:
         # Corrected tool name to match heatsight_tools.py
         get_relocation_plan_summary,
         # NEW TOOL ADDED
-        record_relocation_outcome
+        record_relocation_outcome,
+        explain_relocation_reason
     ]
     # --- END UPDATED TOOLS LIST ---
 
@@ -392,6 +394,7 @@ with tab5:
                     "If you cannot find relevant information with your tools, state that clearly and suggest what information you can provide instead. "
                     "Use emojis appropriately to make your responses more engaging where suitable (e.g., 🔥 for hot, ❄️ for cold, 📦 for relocation)."
                     "When asked 'why' or to 'explain' an observation (e.g., why a zone is hot/cold, why a product is recommended for relocation), provide a detailed, data-driven explanation using the information from your tools. For zone categories, explain the criteria (visits, online views) that led to that classification. For relocation recommendations, explain the reasoning (e.g., cold zone product moving to hot zone, replacing underperforming product)."
+                    "When asked about a specific product, cross-check the relocation plan, heatmap zone category, online views, and recommend whether the move makes sense based on this data."
                 "Strive to provide context and quantitative support for your explanations. For example, if a zone is 'Cold', mention its visit count compared to others."
 
                 ),

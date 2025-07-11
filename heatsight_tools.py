@@ -53,13 +53,24 @@ def _load_df(file_path):
         return pd.DataFrame()
 
 
+# --- Global DataFrames loaded once for tool consistency ---
+_final_insights_df = _load_df(FINAL_INSIGHTS_FILE_PATH)
+_relocation_plan_df = _load_df(RELOCATION_PLAN_PATH)
+
+
 def _load_final_insights_df():
-    """Loads the final product insights data from a CSV file."""
-    return _load_df(FINAL_INSIGHTS_FILE_PATH)
+    """Returns the in-memory final product insights DataFrame."""
+    global _final_insights_df
+    if _final_insights_df is None or _final_insights_df.empty:
+        _final_insights_df = _load_df(FINAL_INSIGHTS_FILE_PATH)
+    return _final_insights_df
 
 def _load_relocation_plan_df():
-    """Loads the relocation plan data from its CSV file."""
-    return _load_df(RELOCATION_PLAN_PATH)
+    """Returns the in-memory relocation plan DataFrame."""
+    global _relocation_plan_df
+    if _relocation_plan_df is None or _relocation_plan_df.empty:
+        _relocation_plan_df = _load_df(RELOCATION_PLAN_PATH)
+    return _relocation_plan_df
 
 
 # --- Agent Memory Management ---
@@ -300,3 +311,53 @@ def record_relocation_outcome(product_name: str, old_zone: str, new_zone: str, o
     except Exception as e:
         print(f"ERROR: Failed to record relocation outcome: {e}")
         return f"Failed to record relocation outcome due to an error: {e}"
+
+
+@tool
+def explain_relocation_reason(product_name: str) -> str:
+    """Explains why a product is or isn't scheduled for relocation."""
+    print(f"DEBUG: explain_relocation_reason called for {product_name}")
+
+    insights_df = _load_final_insights_df()
+    if insights_df.empty:
+        return "Final insights data not available. Please ensure final_insights.py has been run."
+
+    product_df = insights_df[insights_df['Product_Name'].str.contains(product_name, case=False, na=False)]
+    if product_df.empty:
+        return f"No data found for product '{product_name}'. Please provide a valid product name."
+    if len(product_df) > 1:
+        matches = ", ".join(product_df['Product_Name'].tolist())
+        return f"Multiple products match '{product_name}'. Please be more specific. Matches: {matches}"
+
+    product_row = product_df.iloc[0]
+    prod_name = product_row['Product_Name']
+    current_zone = product_row['Zone']
+    current_cat = product_row['Zone_Category']
+    visits = int(product_row['Visits'])
+    online_views = int(product_row['Online_Views'])
+
+    relocation_df = _load_relocation_plan_df()
+    relocation_match = relocation_df[relocation_df['Product_Name'].str.contains(product_name, case=False, na=False)] if not relocation_df.empty else pd.DataFrame()
+
+    if relocation_match.empty:
+        return (
+            f"{prod_name} is not in the relocation plan. It is in zone {current_zone} "
+            f"({current_cat.lower()}), has {online_views} online views and {visits} in-store visits, "
+            "and may benefit from future relocation."
+        )
+
+    rel_row = relocation_match.iloc[0]
+    new_zone = rel_row['New_Zone']
+    replaced_product = rel_row['Old_Product_Name']
+
+    new_zone_info = insights_df[insights_df['Zone'] == new_zone].iloc[0]
+    new_cat = new_zone_info['Zone_Category']
+    new_visits = int(new_zone_info['Visits'])
+
+    reason = (
+        f"{prod_name} will move from {current_zone} ({current_cat.lower()}) to {new_zone} "
+        f"({new_cat.lower()}) replacing {replaced_product}. It currently receives {visits} visits "
+        f"with {online_views} online views, while the target zone sees {new_visits} visits. "
+        "Relocating aims to capitalize on higher foot traffic and convert online interest into sales."
+    )
+    return reason
