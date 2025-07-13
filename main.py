@@ -23,12 +23,21 @@ from stock_alerts import generate_stock_alerts
 from heatsight_tools import (
     get_zone_performance,
     get_product_insights,
-    # Corrected name: get_relocation_recommendations -> get_relocation_plan_summary
     get_relocation_plan_summary,
-    # NEW TOOL: record_relocation_outcome
     record_relocation_outcome,
     explain_relocation_reason,
-    run_store_layout_optimizer
+    run_store_layout_optimizer,
+    get_relocation_score,
+    get_dwell_time_by_zone,
+    get_conversion_rate_by_zone,
+    get_sales_velocity,
+    get_inventory_reorder_recommendations,
+    get_customer_journey_patterns,
+    suggest_seasonal_layout_changes,
+    compare_layout_metrics,
+    run_what_if_placement,
+    fetch_complementary_products,
+    get_real_time_placement_recommendation,
 )
 # --- END UPDATED IMPORTS ---
 
@@ -204,6 +213,14 @@ with st.sidebar:
     st.markdown("---")
     st.subheader("🚀 Project Status:")
     st.info("ShelfSense Copilot is now integrated!")
+    st.markdown("**Relocation Score Factors:**")
+    st.markdown(
+        "- Footfall and POS sales\n"
+        "- Online interest and sales velocity\n"
+        "- Conversion rate by zone\n"
+        "- Cold zone or failed moves penalties\n"
+        "- Seasonal fit and complementary products"
+    )
     st.markdown("---")
     if st.button("Refresh Data"):
         st.experimental_rerun()
@@ -365,12 +382,21 @@ with tab6:
     tools = [
         get_zone_performance,
         get_product_insights,
-        # Corrected tool name to match heatsight_tools.py
         get_relocation_plan_summary,
-        # NEW TOOL ADDED
         record_relocation_outcome,
         explain_relocation_reason,
-        run_store_layout_optimizer
+        run_store_layout_optimizer,
+        get_relocation_score,
+        get_dwell_time_by_zone,
+        get_conversion_rate_by_zone,
+        get_sales_velocity,
+        get_inventory_reorder_recommendations,
+        get_customer_journey_patterns,
+        suggest_seasonal_layout_changes,
+        compare_layout_metrics,
+        run_what_if_placement,
+        fetch_complementary_products,
+        get_real_time_placement_recommendation,
     ]
     # --- END UPDATED TOOLS LIST ---
 
