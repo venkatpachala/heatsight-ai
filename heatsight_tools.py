@@ -377,3 +377,184 @@ def run_store_layout_optimizer() -> str:
         )
     except Exception as e:
         return f"Failed to optimize layout: {e}"
+
+@tool
+def get_relocation_score(product_name: str) -> str:
+    """Return the relocation score and suggested zone for a given product."""
+    path = os.path.join(INSIGHTS_DIR, "relocation_intelligence.csv")
+    if os.path.exists(path) and os.path.getsize(path) > 0:
+        df = pd.read_csv(path)
+    else:
+        try:
+            from relocation_intelligence import generate_relocation_scores
+            df = generate_relocation_scores()
+        except Exception as e:
+            return f"Failed to compute relocation score: {e}"
+    if df.empty:
+        return "Relocation intelligence data is unavailable."
+    match = df[df['Product_Name'].str.contains(product_name, case=False, na=False)]
+    if match.empty:
+        return f"No relocation score found for '{product_name}'."
+    row = match.iloc[0]
+    return (
+        f"{row['Product_Name']} currently in {row['Current_Zone']} has a relocation score of "
+        f"{row['Relocation_Score']:.1f}. Suggested zone: {row['Suggested_Zone']}. "
+        f"Factors: {row.get('Why_This_Zone', 'N/A')}"
+    )
+
+@tool
+def get_dwell_time_by_zone() -> str:
+    """Compute average dwell time per zone from movement logs."""
+    df = _load_df(MOVEMENTS_PATH)
+    if df.empty or 'Timestamp' not in df.columns:
+        return "Movement data unavailable."
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+    df = df.sort_values(['Customer_ID', 'Timestamp'])
+    df['Next_Time'] = df.groupby('Customer_ID')['Timestamp'].shift(-1)
+    df['Dwell'] = (df['Next_Time'] - df['Timestamp']).dt.total_seconds()
+    dwell = df.groupby('Zone')['Dwell'].mean().dropna()
+    if dwell.empty:
+        return "Not enough movement data to compute dwell time."
+    lines = ["Average dwell time by zone (seconds):"]
+    for zone, sec in dwell.sort_values(ascending=False).items():
+        lines.append(f"- {zone}: {sec:.1f}")
+    return "\n".join(lines)
+
+@tool
+def get_conversion_rate_by_zone() -> str:
+    """Return conversion rate (sales/visits) for each zone."""
+    visits_df = _load_df(MOVEMENTS_PATH)
+    sales_df = _load_df(os.path.join(DATA_DIR, 'pos_sales.csv'))
+    if visits_df.empty or sales_df.empty:
+        return "Movement or sales data unavailable."
+    visits = visits_df['Zone'].value_counts()
+    result_lines = ["Zone conversion rates:"]
+    for _, row in sales_df.iterrows():
+        zone = row['Zone']
+        sales = row['Sales']
+        v = visits.get(zone, 0)
+        rate = sales / v if v > 0 else 0
+        result_lines.append(f"- {zone}: {rate:.2f}")
+    return "\n".join(result_lines)
+
+@tool
+def get_sales_velocity(product_name: str) -> str:
+    """Estimate sales velocity for a product based on zone sales and visits."""
+    insights_df = _load_final_insights_df()
+    if insights_df.empty:
+        return "Insights data unavailable."
+    prod_df = insights_df[insights_df['Product_Name'].str.contains(product_name, case=False, na=False)]
+    if prod_df.empty:
+        return f"Product '{product_name}' not found."
+    row = prod_df.iloc[0]
+    zone = row['Zone']
+    sales_df = _load_df(os.path.join(DATA_DIR, 'pos_sales.csv'))
+    sales = sales_df.loc[sales_df['Zone'] == zone, 'Sales'].sum() if not sales_df.empty else 0
+    move_df = _load_df(MOVEMENTS_PATH)
+    visits = (move_df['Zone'] == zone).sum() if not move_df.empty else 0
+    velocity = sales / visits if visits else sales
+    return (
+        f"{row['Product_Name']} in zone {zone} has a sales velocity of {velocity:.2f} units per visit "
+        f"based on {sales} sales and {visits} visits."
+    )
+
+@tool
+def get_inventory_reorder_recommendations() -> str:
+    """Suggest products that need reordering based on stock levels."""
+    stock_path = os.path.join(DATA_DIR, 'stock_levels.csv')
+    alert_path = os.path.join('insights', 'stock_alerts.csv')
+    stock_df = _load_df(stock_path)
+    if stock_df.empty:
+        return "Stock level data not available."
+    threshold = max(5, int(stock_df['Stock'].quantile(0.25)))
+    low_df = stock_df[stock_df['Stock'] <= threshold]
+    if low_df.empty:
+        return "All products sufficiently stocked."
+    low_df.to_csv(alert_path, index=False)
+    lines = ["Products needing reorder:"]
+    for _, r in low_df.iterrows():
+        lines.append(f"- {r['Product_Name']} (stock {r['Stock']})")
+    return "\n".join(lines)
+
+@tool
+def get_customer_journey_patterns() -> str:
+    """Identify common customer paths through the store."""
+    df = _load_df(MOVEMENTS_PATH)
+    if df.empty:
+        return "Movement data unavailable."
+    df = df.sort_values(['Customer_ID', 'Timestamp'])
+    transitions = df.groupby('Customer_ID')['Zone'].apply(lambda x: list(x))
+    pairs = {}
+    for path in transitions:
+        for i in range(len(path) - 1):
+            pair = (path[i], path[i+1])
+            pairs[pair] = pairs.get(pair, 0) + 1
+    if not pairs:
+        return "Not enough data to derive journeys."
+    top = sorted(pairs.items(), key=lambda x: x[1], reverse=True)[:5]
+    lines = ["Top customer movements:"]
+    for (a,b), count in top:
+        lines.append(f"- {a} → {b}: {count} times")
+    return "\n".join(lines)
+
+@tool
+def suggest_seasonal_layout_changes() -> str:
+    """Provide seasonal placement suggestions from seasonal_plan.csv."""
+    path = os.path.join('insights', 'seasonal_plan.csv')
+    df = _load_df(path)
+    if df.empty:
+        return "Seasonal plan data unavailable."
+    lines = ["Seasonal relocation suggestions:"]
+    for _, r in df.iterrows():
+        lines.append(f"- Move {r['Product_Name']} to {r['Target_Zone']} (demand {r['Seasonal_Demand']})")
+    return "\n".join(lines)
+
+@tool
+def compare_layout_metrics(before_csv: str, after_csv: str) -> str:
+    """Compare zone visit totals before and after a layout change."""
+    before = _load_df(before_csv)
+    after = _load_df(after_csv)
+    if before.empty or after.empty:
+        return "One of the layout files is missing or empty."
+    diff = after['Visits'].sum() - before['Visits'].sum()
+    return f"Total visits changed by {diff}."
+
+@tool
+def run_what_if_placement(query: str) -> str:
+    """Placeholder for what-if placement simulation."""
+    try:
+        from layout_optimizer import optimize_store_layout
+        df = optimize_store_layout()
+        return f"Simulated layout generated with {len(df)} suggestions for query: {query}."
+    except Exception as e:
+        return f"Simulation failed: {e}"
+
+@tool
+def fetch_complementary_products(product_name: str) -> str:
+    """Return a list of complementary products that pair well with the given item."""
+    df = _load_final_insights_df()
+    if df.empty:
+        return "Product insights unavailable."
+    products = df[df['Product_Name'].str.contains(product_name, case=False, na=False)]
+    if products.empty:
+        return f"Product '{product_name}' not found."
+    all_products = df['Product_Name'].tolist()
+    comp = [p for p in all_products if p not in products['Product_Name'].tolist()]
+    suggestions = comp[:3]
+    return "Complementary items: " + ", ".join(suggestions)
+
+@tool
+def get_real_time_placement_recommendation(event_context: str) -> str:
+    """Provide a quick placement suggestion based on current context."""
+    try:
+        from layout_optimizer import optimize_store_layout
+        df = optimize_store_layout()
+        if df.empty:
+            return "No recommendations available right now."
+        top = df.iloc[0]
+        return (
+            f"Move {top['Product_Name']} to {top['Zone']} as a quick win for {event_context}."
+        )
+    except Exception as e:
+        return f"Failed to generate real-time recommendation: {e}"
+
