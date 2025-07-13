@@ -203,7 +203,7 @@ with st.sidebar:
     """)
     st.markdown("---")
     st.subheader("🚀 Project Status:")
-    st.info("AI Agent 'ShelfSense' is now integrated!")
+    st.info("ShelfSense Copilot is now integrated!")
     st.markdown("---")
     if st.button("Refresh Data"):
         st.experimental_rerun()
@@ -215,17 +215,13 @@ Welcome to HeatSight, an innovative solution for Walmart's Sparkathon! This plat
 </p>
 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📊 Dashboard Overview",
     "🔥 In-Store Heatmap",
-    "📈 Omnichannel Insights",
-    "📦 Relocation Plan",
-    "🤖 ShelfSense AI Agent",
     "💵 POS Sales Heatmap",
-    "📅 Seasonal Plan",
-    "🧮 Optimized Layout",
-    "👥 Staff Schedule",
-    "🚨 Stock Alerts"
+    "📈 Omnichannel Insights",
+    "🚚 Relocation Intelligence 🔥",
+    "🤖 ShelfSense Copilot"
 ])
 
 with tab1:
@@ -305,7 +301,7 @@ with tab2:
         st.error(f"Error generating heatmap: {e}")
 
 
-with tab3:
+with tab4:
     st.header("📈 Omnichannel Insights: Bridging Digital & Physical")
     st.markdown("""
     This section merges in-store customer movement data with online product performance to reveal comprehensive insights.
@@ -343,32 +339,23 @@ with tab3:
         st.error("Error: 'insights/final_product_insights.csv' not found. Please run `final_insights.py`.")
 
 
-with tab4:
-    st.header("📦 Smart Relocation Plan: Actionable Optimization")
-    st.markdown("""
-    This section presents actionable insights: products in cold zones with high online demand are suggested to be moved
-    to hot zones currently occupied by underperforming products. This strategy aims to maximize visibility and sales.
-    """)
+with tab5:
+    st.header("🚚 Relocation Intelligence")
+    st.markdown("Computed relocation scores highlight which items deserve better placement.")
 
     try:
-        # Assuming relocation_plan.csv is in 'insights/'
-        relocation_df = pd.read_csv("insights/relocation_plan.csv") 
-        
-        if not relocation_df.empty:
-            st.dataframe(relocation_df)
-            
-            st.subheader("Summary of Relocation Plan")
-            st.info(f"✨ **ShelfSense recommends {len(relocation_df)} strategic product swaps today!**")
-            st.write("This plan aims to maximize visibility for high-demand online products by placing them in high-traffic store areas, while optimizing space from underperforming items.")
+        from relocation_intelligence import generate_relocation_scores
+        df_ri = generate_relocation_scores()
+        if not df_ri.empty:
+            st.dataframe(df_ri.head(20))
         else:
-            st.info("No new relocation suggestions generated for this cycle. The store layout might already be highly optimized or new opportunities haven't emerged.")
+            st.info("Run the relocation intelligence script to generate suggestions.")
+    except Exception as e:
+        st.error(f"Error generating relocation intelligence: {e}")
 
-    except FileNotFoundError:
-        st.error("Error: 'insights/relocation_plan.csv' not found. Please run `relocation_engine.py`.")
 
-
-with tab5:
-    st.header("ShelfSense AI Agent: Your Smart Retail Co-Pilot")
+with tab6:
+    st.header("ShelfSense Copilot")
     st.markdown("""
     Ask ShelfSense anything about store performance, product insights, or relocation plans.
     It can analyze data, explain trends, and provide recommendations using its intelligent tools and memory.
@@ -446,44 +433,7 @@ with tab5:
         st.error(f"Could not initialize Google Gemini LLM or ShelfSense Agent. Error: {e}")
         st.warning("Please check your `GOOGLE_API_KEY` in the `.env` file, ensure `langchain-google-genai` is installed, or review previous error messages in your console.")
 
-with tab6:
+with tab3:
     st.header("POS Sales Heatmap")
     fig = generate_pos_sales_heatmap()
     st.pyplot(fig)
-
-with tab7:
-    st.header("Seasonal Smart Plan")
-    generate_seasonal_plan()
-    try:
-        seasonal_df = pd.read_csv("insights/seasonal_plan.csv")
-        st.dataframe(seasonal_df)
-    except FileNotFoundError:
-        st.info("Run seasonal_planner.py to generate recommendations.")
-
-with tab8:
-    st.header("Smart Layout Optimizer")
-    optimize_store_layout()
-    try:
-        opt_df = pd.read_csv("insights/optimized_layout.csv")
-        st.dataframe(opt_df.head(20))
-    except FileNotFoundError:
-        st.info("Run layout_optimizer.py to create an optimized layout.")
-
-with tab9:
-    st.header("Weekly Staff Schedule")
-    generate_staff_schedule()
-    try:
-        sched_df = pd.read_csv("insights/staff_schedule.csv")
-        st.dataframe(sched_df.head(20))
-    except FileNotFoundError:
-        st.info("Run staff_scheduler.py to create a schedule.")
-
-with tab10:
-    st.header("Stock Depletion Alerts")
-    alerts = generate_stock_alerts()
-    if not alerts.empty:
-        st.dataframe(alerts)
-    else:
-        st.success("No products are below the stock threshold!")
-
-st.markdown("---")
