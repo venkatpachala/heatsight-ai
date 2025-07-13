@@ -361,3 +361,19 @@ def explain_relocation_reason(product_name: str) -> str:
         "Relocating aims to capitalize on higher foot traffic and convert online interest into sales."
     )
     return reason
+
+
+@tool
+def run_store_layout_optimizer() -> str:
+    """Generate an optimized layout using movement, sales and online data."""
+    try:
+        from layout_optimizer import optimize_store_layout
+        df = optimize_store_layout()
+        if df.empty:
+            return "No layout suggestions were generated."
+        return (
+            f"Created {len(df)} layout suggestions. "
+            f"Results saved to {os.path.join('insights', 'optimized_layout.csv')}"
+        )
+    except Exception as e:
+        return f"Failed to optimize layout: {e}"

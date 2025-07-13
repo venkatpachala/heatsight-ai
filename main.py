@@ -14,7 +14,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.memory import ConversationBufferMemory
 
 from seasonal_planner import generate_seasonal_plan
-from layout_optimizer import optimize_layout
+from layout_optimizer import optimize_store_layout
 from staff_scheduler import generate_staff_schedule
 from pos_heatmap import generate_pos_sales_heatmap
 from stock_alerts import generate_stock_alerts
@@ -27,7 +27,8 @@ from heatsight_tools import (
     get_relocation_plan_summary,
     # NEW TOOL: record_relocation_outcome
     record_relocation_outcome,
-    explain_relocation_reason
+    explain_relocation_reason,
+    run_store_layout_optimizer
 )
 # --- END UPDATED IMPORTS ---
 
@@ -381,7 +382,8 @@ with tab5:
         get_relocation_plan_summary,
         # NEW TOOL ADDED
         record_relocation_outcome,
-        explain_relocation_reason
+        explain_relocation_reason,
+        run_store_layout_optimizer
     ]
     # --- END UPDATED TOOLS LIST ---
 
@@ -459,8 +461,8 @@ with tab7:
         st.info("Run seasonal_planner.py to generate recommendations.")
 
 with tab8:
-    st.header("Greedy Layout Optimizer")
-    optimize_layout()
+    st.header("Smart Layout Optimizer")
+    optimize_store_layout()
     try:
         opt_df = pd.read_csv("insights/optimized_layout.csv")
         st.dataframe(opt_df.head(20))
