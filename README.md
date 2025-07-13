@@ -11,4 +11,5 @@ HeatSight is an intelligent retail heatmap + relocation engine that:
 - Online vs offline performance merging
 - Smart relocation engine (cold zone → hot zone)
 - Modular, Python-based, and expandable
+- Relocation Intelligence tab with multi-criteria scoring
 
