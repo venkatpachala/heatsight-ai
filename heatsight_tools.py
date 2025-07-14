@@ -247,39 +247,57 @@ def get_hot_cold_zones() -> str:
     return response.strip()
 
 @tool
-def get_past_relocation_outcomes(product_name: str = None) -> str:
+def get_past_relocation_outcomes(product_name: str = None, zone: str = None) -> str:
     """
     Retrieves recorded outcomes of past product relocations from the agent's memory (decision_log.json).
-    Can retrieve all outcomes or filter by a specific product name.
+    Can retrieve all outcomes or filter by a specific product name or zone.
 
     Args:
-        product_name (str, optional): The name of the product whose past relocation outcomes are sought.
-                                      If None, all recorded outcomes are returned.
+        product_name (str, optional): Filter by product name.
+        zone (str, optional): Filter by a zone involved in the move (old or new).
     """
-    print(f"DEBUG: get_past_relocation_outcomes called for product_name: {product_name}")
+    print(f"DEBUG: get_past_relocation_outcomes called for product_name={product_name}, zone={zone}")
     decision_log = _load_decision_log()
     if not decision_log:
         return "Agent memory is empty. No past relocation outcomes have been recorded yet."
 
-    relevant_outcomes = []
+    relevant_outcomes = decision_log
     if product_name:
-        relevant_outcomes = [
-            entry for entry in decision_log
-            if entry['product_name'].lower() == product_name.lower()
-        ]
-        if not relevant_outcomes:
-            return f"No past relocation outcomes found for product '{product_name}' in agent memory."
-        response_parts = [f"Past relocation outcomes for {product_name}:"]
-    else:
-        relevant_outcomes = decision_log
-        response_parts = ["All past relocation outcomes:"]
+        relevant_outcomes = [entry for entry in relevant_outcomes if entry['product_name'].lower() == product_name.lower()]
+    if zone:
+        zone_l = zone.lower()
+        if zone_l in ("hot", "cold"):
+            df = _load_final_insights_df()
+            zone_set = set(
+                df[df["Zone_Category"].str.lower() == zone_l]["Zone"].str.upper()
+            )
+            relevant_outcomes = [
+                entry
+                for entry in relevant_outcomes
+                if entry["old_zone"].upper() in zone_set or entry["new_zone"].upper() in zone_set
+            ]
+        else:
+            zone_u = zone.upper()
+            relevant_outcomes = [
+                entry
+                for entry in relevant_outcomes
+                if entry["old_zone"].upper() == zone_u or entry["new_zone"].upper() == zone_u
+            ]
+    if not relevant_outcomes:
+        filters = []
+        if product_name:
+            filters.append(f"product '{product_name}'")
+        if zone:
+            filters.append(f"zone '{zone}'")
+        filt_str = " and ".join(filters) if filters else "the log"
+        return f"No past relocation outcomes found for {filt_str}."
+    response_parts = ["Past relocation outcomes:"]
 
 
     for outcome in relevant_outcomes:
         response_parts.append(
-            f"- On {outcome['timestamp'][:10]}, {outcome['product_name']} was moved from "
-            f"{outcome['old_zone']} to {outcome['new_zone']}. Outcome: {outcome['outcome_description']}."
-        )
+            f"- On {outcome['date']}, {outcome['product_name']} was moved from "
+            f"{outcome['old_zone']} to {outcome['new_zone']}. Outcome: {outcome['outcome_description']}.")
     
     response = "\n".join(response_parts)
     print(f"DEBUG: get_past_relocation_outcomes response: {response[:200]}...") # Print a snippet
@@ -302,11 +320,11 @@ def record_relocation_outcome(product_name: str, old_zone: str, new_zone: str, o
         current_log = _load_decision_log()
         
         new_entry = {
-            "timestamp": datetime.now().isoformat(),
             "product_name": product_name,
             "old_zone": old_zone,
             "new_zone": new_zone,
-            "outcome_description": outcome_description
+            "date": datetime.now().date().isoformat(),
+            "outcome_description": outcome_description,
         }
         
         current_log.append(new_entry)
@@ -797,13 +815,13 @@ def get_last_month_relocations() -> str:
     if not log:
         return "No relocation history available."
     cutoff = datetime.now() - pd.Timedelta(days=30)
-    recent = [d for d in log if datetime.fromisoformat(d['timestamp']) >= cutoff]
+    recent = [d for d in log if datetime.fromisoformat(d['date']) >= cutoff]
     if not recent:
         return "No relocations in the last month."
     lines = ["Relocations in the last month:"]
     for d in recent:
         lines.append(
-            f"- {d['product_name']} from {d['old_zone']} to {d['new_zone']} on {d['timestamp'][:10]}"
+            f"- {d['product_name']} from {d['old_zone']} to {d['new_zone']} on {d['date']}"
         )
     return "\n".join(lines)
 

@@ -47,6 +47,7 @@ from heatsight_tools import (
     get_top_footfall_zones,
     get_low_conversion_hot_zones,
     get_products_to_relocate,
+    get_past_relocation_outcomes,
     get_relocation_reason,
     simulate_relocation_swap,
     get_high_online_low_pos_products,
@@ -440,6 +441,7 @@ with tab6:
         get_top_footfall_zones,
         get_low_conversion_hot_zones,
         get_products_to_relocate,
+        get_past_relocation_outcomes,
         get_relocation_reason,
         simulate_relocation_swap,
         get_high_online_low_pos_products,
@@ -475,6 +477,7 @@ with tab6:
                     "You are ShelfSense AI, a retail optimization copilot. "
                     "You help analyze shelf performance, recommend product relocations, simulate changes, and give business insights across footfall, POS sales, and online interest. "
                     "You have access to memory, real-time data files, and tools to analyze store layout and behavior. "
+                    "Use the get_past_relocation_outcomes tool whenever a user asks about prior moves or relocation history. "
                     "You can use category-level complementary logic to enhance placement strategy."
                 ),
                 MessagesPlaceholder(variable_name="chat_history"),
