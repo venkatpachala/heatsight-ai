@@ -1,0 +1,30 @@
+[
+  {
+    "product_name": "Toothpaste",
+    "old_zone": "D4",
+    "new_zone": "B2",
+    "date": "2025-07-10",
+    "outcome_description": "Sales increased by 12% after relocation"
+  },
+  {
+    "product_name": "Detergent",
+    "old_zone": "C2",
+    "new_zone": "A1",
+    "date": "2025-07-07",
+    "outcome_description": "Sales dropped 8%, low visibility – avoid A1"
+  },
+  {
+    "product_name": "Protein Bars",
+    "old_zone": "D3",
+    "new_zone": "B1",
+    "date": "2025-07-05",
+    "outcome_description": "Sales increased 18%, good match with Gym Supplements nearby"
+  },
+  {
+    "product_name": "Chocolate Gift Pack",
+    "old_zone": "F5",
+    "new_zone": "Checkout",
+    "date": "2025-07-04",
+    "outcome_description": "Festival sales boosted by 30% – great festive spot"
+  }
+]
