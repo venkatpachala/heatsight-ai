@@ -3,8 +3,14 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import streamlit as st
 
 POS_SALES_PATH = os.path.join('data', 'pos_sales.csv')
+
+
+@st.cache_data
+def load_pos_sales():
+    return pd.read_csv(POS_SALES_PATH)
 
 
 def generate_pos_sales_heatmap():
@@ -15,8 +21,8 @@ def generate_pos_sales_heatmap():
         zones = layout_df['Zone']
         sales_df = pd.DataFrame({'Zone': zones, 'Sales': np.random.randint(50, 200, len(zones))})
         sales_df.to_csv(POS_SALES_PATH, index=False)
-    else:
-        sales_df = pd.read_csv(POS_SALES_PATH)
+
+    sales_df = load_pos_sales()
 
     zone_sales = sales_df.set_index('Zone')['Sales'].to_dict()
     rows = [chr(ord('A') + i) for i in range(10)]
