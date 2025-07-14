@@ -17,6 +17,7 @@ ONLINE_PERFORMANCE_PATH = os.path.join(DATA_DIR, "online_performance.csv")
 FINAL_INSIGHTS_FILE_PATH = os.path.join(INSIGHTS_DIR, "final_product_insights.csv")
 RELOCATION_PLAN_PATH = os.path.join(INSIGHTS_DIR, "relocation_plan.csv")
 DECISION_LOG_PATH = os.path.join(AGENT_MEMORY_DIR, "decision_log.json") # Renamed for clarity
+PRODUCT_CATEGORY_MAP_PATH = os.path.join(DATA_DIR, "product_category_map.csv")
 
 # Ensure directories exist
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -606,6 +607,50 @@ def get_complementary_products(product_name: str) -> str:
     if not comps:
         return "No complementary products found."
     return "Complementary items: " + ", ".join(comps)
+
+
+@tool
+def suggest_complementary_pairs() -> str:
+    """
+    Returns a list of complementary product placement pairs based on category similarity and current location.
+    """
+    if not os.path.exists(PRODUCT_CATEGORY_MAP_PATH):
+        return "Product category mapping file not available."
+
+    df = pd.read_csv(PRODUCT_CATEGORY_MAP_PATH)
+    if df.empty:
+        return "Product category mapping file not available."
+
+    rules = {
+        "Cereal": "Milk",
+        "Shampoo": "Conditioner",
+        "Chips": "Cold Drinks",
+        "Toothpaste": "Toothbrush",
+        "Bread": "Butter/Jam",
+        "Pasta": "Pasta Sauce",
+        "Chocolates": "Gifting Items",
+        "Maggi": "Tomato Ketchup",
+    }
+
+    suggestions = []
+    for cat_a, cat_b in rules.items():
+        a_df = df[df["Category"].str.contains(cat_a, case=False, na=False)]
+        b_df = df[df["Category"].str.contains(cat_b, case=False, na=False)]
+        if a_df.empty or b_df.empty:
+            continue
+        a_row = a_df.iloc[0]
+        b_row = b_df.iloc[0]
+        zone_a = str(a_row["Current_Zone"])
+        zone_b = str(b_row["Current_Zone"])
+        if zone_a and zone_b and zone_a[0] != zone_b[0]:
+            suggestions.append(
+                f"Consider relocating {a_row['Product_Name']} near {b_row['Product_Name']} (zones {zone_a} & {zone_b})."
+            )
+
+    if not suggestions:
+        return "No complementary placement suggestions available."
+
+    return "\n".join(suggestions)
 
 
 @tool

@@ -42,6 +42,7 @@ from heatsight_tools import (
     get_declining_products,
     compare_dwell_time,
     get_complementary_products,
+    suggest_complementary_pairs,
     get_top_footfall_zones,
     get_low_conversion_hot_zones,
     get_products_to_relocate,
@@ -418,6 +419,7 @@ with tab6:
         get_declining_products,
         compare_dwell_time,
         get_complementary_products,
+        suggest_complementary_pairs,
         get_top_footfall_zones,
         get_low_conversion_hot_zones,
         get_products_to_relocate,
@@ -442,7 +444,8 @@ with tab6:
                     "system",
                     "You are ShelfSense AI, a retail optimization copilot. "
                     "You help analyze shelf performance, recommend product relocations, simulate changes, and give business insights across footfall, POS sales, and online interest. "
-                    "You have access to memory, real-time data files, and tools to analyze store layout and behavior."
+                    "You have access to memory, real-time data files, and tools to analyze store layout and behavior. "
+                    "You can use category-level complementary logic to enhance placement strategy."
                 ),
                 MessagesPlaceholder(variable_name="chat_history"),
                 ("human", "{input}"),
