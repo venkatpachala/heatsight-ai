@@ -19,6 +19,15 @@ RELOCATION_PLAN_PATH = os.path.join(INSIGHTS_DIR, "relocation_plan.csv")
 DECISION_LOG_PATH = os.path.join(AGENT_MEMORY_DIR, "decision_log.json") # Renamed for clarity
 PRODUCT_CATEGORY_MAP_PATH = os.path.join(DATA_DIR, "product_category_map.csv")
 
+# List of premium products considered for special placement simulations
+premium_products = [
+    "Chocolate Gift Pack",
+    "Protein Shake",
+    "Luxury Shampoo",
+    "Dry Fruits",
+    "Premium Cookies",
+]
+
 # Ensure directories exist
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(INSIGHTS_DIR, exist_ok=True)
@@ -545,12 +554,17 @@ def compare_layout_metrics(before_csv: str, after_csv: str) -> str:
     return f"Total visits changed by {diff}."
 
 @tool
-def run_what_if_placement(query: str) -> str:
-    """Placeholder for what-if placement simulation."""
+def run_what_if_placement(product_name: str, new_zone: str) -> str:
+    """Simulate relocating a product and estimate sales impact."""
     try:
-        from layout_optimizer import optimize_store_layout
-        df = optimize_store_layout()
-        return f"Simulated layout generated with {len(df)} suggestions for query: {query}."
+        from simulation_engine import run_what_if_placement as _simulate
+        result = _simulate(product_name, new_zone)
+        if isinstance(result, dict) and "error" in result:
+            return result["error"]
+        return (
+            f"{result['product']} from {result['from']} to {result['to']} "
+            f"-> {result['predicted_sales_uplift']} uplift. {result['reasoning']}"
+        )
     except Exception as e:
         return f"Simulation failed: {e}"
 
