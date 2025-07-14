@@ -111,16 +111,100 @@ def generate_relocation_scores():
     })
     zone_df["score"] = _normalize(zone_df["footfall"]) * 0.6 + _normalize(zone_df["sales"]) * 0.4
 
-    def suggest_zone(current_zone):
-        if zone_df.empty:
-            return current_zone
-        best = zone_df.sort_values("score", ascending=False)["Zone"].tolist()
-        for z in best:
-            if z != current_zone:
-                return z
-        return current_zone
+    # ----- diversified zone suggestion logic -----
+    def _categorize(name: str) -> str:
+        """Rudimentary product category based on keywords."""
+        name = str(name).lower()
+        electronics_kw = [
+            "tv",
+            "laptop",
+            "speaker",
+            "headphone",
+            "power bank",
+            "phone",
+            "printer",
+            "iron",
+            "mixer",
+            "charger",
+            "bulb",
+            "fan",
+        ]
+        grocery_kw = [
+            "milk",
+            "flour",
+            "sugar",
+            "rice",
+            "bread",
+            "butter",
+            "oil",
+            "jam",
+            "biscuit",
+            "noodle",
+            "juice",
+            "masala",
+            "dal",
+            "salt",
+            "cookies",
+            "chips",
+            "onion",
+            "apple",
+            "banana",
+            "potato",
+        ]
+        if any(k in name for k in electronics_kw):
+            return "electronics"
+        if any(k in name for k in grocery_kw):
+            return "grocery"
+        return "general"
 
-    df["Suggested_Zone"] = df["Zone"].apply(suggest_zone)
+    # category of each zone based on currently placed product
+    zone_category_map = {
+        row["Zone"]: _categorize(row["Product_Name"])
+        for _, row in layout_df.iterrows()
+    }
+
+    # compute top hot zones
+    top_zones = (
+        zone_df.sort_values("score", ascending=False)["Zone"].head(4).tolist()
+    )
+    if not top_zones:
+        top_zones = zone_df.sort_values("score", ascending=False)["Zone"].tolist()
+
+    # mock capacity: current product count + 4
+    base_capacity = layout_df["Zone"].value_counts().to_dict()
+    zone_capacity = {z: base_capacity.get(z, 0) + 4 for z in top_zones}
+    assigned = {z: 0 for z in top_zones}
+
+    # add product categories
+    df["product_category"] = df["Product_Name"].apply(_categorize)
+
+    # sort products by score for assignment
+    df = df.sort_values("Relocation_Score", ascending=False)
+
+    suggestions = []
+    for _, row in df.iterrows():
+        current_zone = row["Zone"]
+        pcat = row["product_category"]
+        chosen = current_zone
+        for zone in top_zones:
+            if zone == current_zone:
+                continue
+            if assigned[zone] >= zone_capacity[zone]:
+                continue
+            zcat = zone_category_map.get(zone, "general")
+            # incompatible if one is electronics and the other is grocery
+            if (
+                (pcat == "electronics" and zcat == "grocery")
+                or (pcat == "grocery" and zcat == "electronics")
+            ):
+                continue
+            chosen = zone
+            assigned[zone] += 1
+            break
+        suggestions.append(chosen)
+
+    df["Suggested_Zone"] = suggestions
+
 
     def explain(row):
         contributions = {
