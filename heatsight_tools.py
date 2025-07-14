@@ -637,6 +637,159 @@ def analyze_restock_needs() -> str:
 
 
 @tool
+def get_top_footfall_zones(top_n: int = 5) -> str:
+    """Return the zones with the highest customer visits."""
+    df = _load_final_insights_df()
+    if df.empty:
+        return "Final insights data not available."
+    visits = df.groupby('Zone')['Visits'].sum().sort_values(ascending=False).head(top_n)
+    lines = ["Top zones by footfall:"]
+    for zone, v in visits.items():
+        lines.append(f"- {zone}: {int(v)} visits")
+    return "\n".join(lines)
+
+
+@tool
+def get_low_conversion_hot_zones() -> str:
+    """Identify hot zones with many visits but low sales."""
+    insights_df = _load_final_insights_df()
+    sales_path = os.path.join(DATA_DIR, 'sales_by_hour.csv')
+    sales_df = _load_df(sales_path)
+    layout_df = _load_df(STORE_LAYOUT_PATH)
+    if insights_df.empty or sales_df.empty or layout_df.empty:
+        return "Required data unavailable."
+    sales_totals = sales_df.groupby('Product_ID')['Sales'].sum().reset_index()
+    zone_sales = pd.merge(layout_df, sales_totals, on='Product_ID', how='left').groupby('Zone')['Sales'].sum().fillna(0)
+    zone_visits = insights_df.groupby('Zone')['Visits'].sum()
+    df = pd.DataFrame({'Visits': zone_visits, 'Sales': zone_sales})
+    df['Conversion'] = df['Sales'] / df['Visits'].replace(0, 1)
+    hot_zones = insights_df[insights_df['Zone_Category'] == 'Hot']['Zone'].unique()
+    low_df = df.loc[hot_zones]
+    low_df = low_df[low_df['Conversion'] < 0.3]
+    if low_df.empty:
+        return "No low conversion hot zones found."
+    lines = ["Hot zones with low conversion:"]
+    for zone, row in low_df.sort_values('Conversion').iterrows():
+        lines.append(f"- {zone}: {int(row['Visits'])} visits, {int(row['Sales'])} sales")
+    return "\n".join(lines)
+
+
+@tool
+def get_products_to_relocate(top_n: int = 5) -> str:
+    """Products trending online but sitting in cold zones."""
+    df = _load_final_insights_df()
+    if df.empty:
+        return "Final insights data not available."
+    cold = df[df['Zone_Category'] == 'Cold']
+    cold = cold.sort_values('Online_Views', ascending=False).head(top_n)
+    if cold.empty:
+        return "No products need relocation."
+    lines = ["Trending products in cold zones:"]
+    for _, r in cold.iterrows():
+        lines.append(f"- {r['Product_Name']} in {r['Zone']} with {int(r['Online_Views'])} views")
+    return "\n".join(lines)
+
+
+@tool
+def get_relocation_reason(product_name: str) -> str:
+    """Explain why a product should be relocated."""
+    return explain_relocation_reason.func(product_name)
+
+
+@tool
+def simulate_relocation_swap(product_a: str, zone_a: str, product_b: str, zone_b: str) -> str:
+    """Simulate impact of swapping two products between zones."""
+    df = _load_final_insights_df()
+    if df.empty:
+        return "Final insights data not available."
+    a_row = df[df['Product_Name'].str.contains(product_a, case=False, na=False)]
+    b_row = df[df['Product_Name'].str.contains(product_b, case=False, na=False)]
+    if a_row.empty or b_row.empty:
+        return "One of the products not found."
+    a_vis = int(a_row.iloc[0]['Visits'])
+    b_vis = int(b_row.iloc[0]['Visits'])
+    gain_a = b_vis - a_vis
+    gain_b = a_vis - b_vis
+    return (
+        f"Moving {product_a} to {zone_b} could change visits by {gain_a}; "
+        f"moving {product_b} to {zone_a} could change visits by {gain_b}."
+    )
+
+
+@tool
+def get_high_online_low_pos_products(top_n: int = 5) -> str:
+    """Products with high online views but low POS sales."""
+    insights_df = _load_final_insights_df()
+    sales_path = os.path.join(DATA_DIR, 'sales_by_hour.csv')
+    sales_df = _load_df(sales_path)
+    layout_df = _load_df(STORE_LAYOUT_PATH)
+    if insights_df.empty or sales_df.empty or layout_df.empty:
+        return "Required data unavailable."
+    sales_totals = sales_df.groupby('Product_ID')['Sales'].sum().reset_index()
+    merged = pd.merge(layout_df, sales_totals, on='Product_ID', how='left')
+    merged = pd.merge(merged, insights_df[['Product_ID', 'Online_Views']], on='Product_ID', how='left')
+    merged['Sales'] = merged['Sales'].fillna(0)
+    high_online = merged.sort_values('Online_Views', ascending=False)
+    candidates = high_online[high_online['Sales'] < merged['Sales'].quantile(0.3)].head(top_n)
+    if candidates.empty:
+        return "No such products found."
+    lines = ["High online view but low POS sales:"]
+    for _, r in candidates.iterrows():
+        lines.append(f"- {r['Product_Name']} ({int(r['Online_Views'])} views, {int(r['Sales'])} sales)")
+    return "\n".join(lines)
+
+
+@tool
+def get_last_month_relocations() -> str:
+    """Retrieve relocation decisions from the last month."""
+    log = _load_decision_log()
+    if not log:
+        return "No relocation history available."
+    cutoff = datetime.now() - pd.Timedelta(days=30)
+    recent = [d for d in log if datetime.fromisoformat(d['timestamp']) >= cutoff]
+    if not recent:
+        return "No relocations in the last month."
+    lines = ["Relocations in the last month:"]
+    for d in recent:
+        lines.append(
+            f"- {d['product_name']} from {d['old_zone']} to {d['new_zone']} on {d['timestamp'][:10]}"
+        )
+    return "\n".join(lines)
+
+
+@tool
+def recommend_seasonal_plan(festival: str) -> str:
+    """Suggest shelf changes for an upcoming event or festival."""
+    try:
+        from seasonal_planner import generate_seasonal_plan
+        generate_seasonal_plan(festival)
+        path = os.path.join('insights', 'seasonal_plan.csv')
+        df = _load_df(path)
+        if df.empty:
+            return "Seasonal plan data unavailable."
+        top = df.head(5)
+        lines = [f"Seasonal plan for {festival}:"]
+        for _, r in top.iterrows():
+            lines.append(f"- Move {r['Product_Name']} to {r['Target_Zone']} (demand {r['Seasonal_Demand']})")
+        return "\n".join(lines)
+    except Exception as e:
+        return f"Failed to generate seasonal plan: {e}"
+
+
+@tool
+def get_impulse_placement_suggestions(top_n: int = 5) -> str:
+    """Recommend products suited for checkout impulse placement."""
+    df = _load_final_insights_df()
+    if df.empty:
+        return "Final insights data not available."
+    df = df.sort_values(['Visits', 'Online_Views'], ascending=False).head(top_n)
+    lines = ["Impulse placement suggestions:"]
+    for _, r in df.iterrows():
+        lines.append(f"- {r['Product_Name']}")
+    return "\n".join(lines)
+
+
+@tool
 def trigger_stock_alerts() -> str:
     """Trigger stock alerts using stock_alerts module."""
     try:

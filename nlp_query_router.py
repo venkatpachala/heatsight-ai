@@ -4,10 +4,16 @@ from typing import Tuple
 
 
 CATEGORIES = {
-    'performance': ['sales', 'revenue', 'conversion'],
+    'zone': ['zone', 'footfall'],
+    'conversion': ['conversion'],
+    'relocate': ['relocate'],
+    'simulate': ['simulate', 'what-if'],
+    'holiday': ['holiday', 'festival'],
+    'checkout': ['checkout'],
+    'roi': ['roi', 'underperform'],
+    'performance': ['sales', 'revenue'],
     'behavior': ['dwell', 'path', 'journey'],
     'stock': ['stock', 'restock', 'inventory'],
-    'prediction': ['predict', 'forecast'],
     'optimization': ['optimize', 'placement', 'layout']
 }
 
