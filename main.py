@@ -488,12 +488,12 @@ with tab7:
         cat, kw = classify_query(query)
         st.write(f"Category: {cat}")
         if cat == 'performance':
-            st.write(get_zone_conversion_rate())
+            st.write(get_zone_conversion_rate.run(""))
         elif cat == 'behavior':
-            st.write(get_customer_journey_patterns())
+            st.write(get_customer_journey_patterns.run(""))
         elif cat == 'stock':
-            st.write(analyze_restock_needs())
+            st.write(analyze_restock_needs.run(""))
         elif cat == 'optimization':
-            st.write(recommend_product_placement())
+            st.write(recommend_product_placement.run(""))
         else:
             st.write("I'll need more context to answer that.")
