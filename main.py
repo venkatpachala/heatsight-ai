@@ -42,6 +42,15 @@ from heatsight_tools import (
     get_declining_products,
     compare_dwell_time,
     get_complementary_products,
+    get_top_footfall_zones,
+    get_low_conversion_hot_zones,
+    get_products_to_relocate,
+    get_relocation_reason,
+    simulate_relocation_swap,
+    get_high_online_low_pos_products,
+    get_last_month_relocations,
+    recommend_seasonal_plan,
+    get_impulse_placement_suggestions,
     recommend_product_placement,
     analyze_restock_needs,
     trigger_stock_alerts,
@@ -409,6 +418,15 @@ with tab6:
         get_declining_products,
         compare_dwell_time,
         get_complementary_products,
+        get_top_footfall_zones,
+        get_low_conversion_hot_zones,
+        get_products_to_relocate,
+        get_relocation_reason,
+        simulate_relocation_swap,
+        get_high_online_low_pos_products,
+        get_last_month_relocations,
+        recommend_seasonal_plan,
+        get_impulse_placement_suggestions,
         recommend_product_placement,
         analyze_restock_needs,
         trigger_stock_alerts,
@@ -422,20 +440,9 @@ with tab6:
             [
                 (
                     "system",
-                    "You are ShelfSense, a highly intelligent and helpful AI assistant for Walmart store managers. "
-                    "Your primary goal is to provide data-driven insights and actionable recommendations for optimizing store layouts and product placements based on in-store traffic and online performance. "
-                    "You have access to tools to retrieve information about store zones, products, and relocation plans, and to recall past decisions. "
-                    "Always be concise, precise, and polite. If you need more information to answer a question accurately, ask follow-up questions (e.g., 'Could you please specify the product name?' or 'Which zone are you asking about?'). "
-                    "When answering about relocation plans, clearly mention the product to move in, its online views, its current cold zone, and the suggested hot zone it should move to (by replacing another product). "
-                    "When asked about past outcomes, use your memory tool (`get_past_relocation_outcome`) to find specific results and state the simulated outcome clearly. "
-                    # IMPORTANT: Add a specific instruction for the new tool
-                    "You can also record simulated outcomes of relocation actions using the `record_relocation_outcome` tool. Use this tool when the user explicitly asks you to 'log' or 'record' a simulated outcome for a specific product move with its details. "
-                    "If you cannot find relevant information with your tools, state that clearly and suggest what information you can provide instead. "
-                    "Use emojis appropriately to make your responses more engaging where suitable (e.g., 🔥 for hot, ❄️ for cold, 📦 for relocation)."
-                    "When asked 'why' or to 'explain' an observation (e.g., why a zone is hot/cold, why a product is recommended for relocation), provide a detailed, data-driven explanation using the information from your tools. For zone categories, explain the criteria (visits, online views) that led to that classification. For relocation recommendations, explain the reasoning (e.g., cold zone product moving to hot zone, replacing underperforming product)."
-                    "When asked about a specific product, cross-check the relocation plan, heatmap zone category, online views, and recommend whether the move makes sense based on this data."
-                "Strive to provide context and quantitative support for your explanations. For example, if a zone is 'Cold', mention its visit count compared to others."
-
+                    "You are ShelfSense AI, a retail optimization copilot. "
+                    "You help analyze shelf performance, recommend product relocations, simulate changes, and give business insights across footfall, POS sales, and online interest. "
+                    "You have access to memory, real-time data files, and tools to analyze store layout and behavior."
                 ),
                 MessagesPlaceholder(variable_name="chat_history"),
                 ("human", "{input}"),
@@ -487,7 +494,21 @@ with tab7:
         from nlp_query_router import classify_query
         cat, kw = classify_query(query)
         st.write(f"Category: {cat}")
-        if cat == 'performance':
+        if cat == 'zone':
+            st.write(get_top_footfall_zones.func())
+        elif cat == 'conversion':
+            st.write(get_low_conversion_hot_zones.func())
+        elif cat == 'relocate':
+            st.write(get_relocation_plan_summary.func())
+        elif cat == 'simulate':
+            st.write(run_what_if_placement.func(query))
+        elif cat == 'holiday':
+            st.write(recommend_seasonal_plan.func(kw))
+        elif cat == 'checkout':
+            st.write(get_impulse_placement_suggestions.func())
+        elif cat in ('roi', 'underperform'):
+            st.write(get_declining_products.func())
+        elif cat == 'performance':
             st.write(get_zone_conversion_rate.func())
         elif cat == 'behavior':
             st.write(get_customer_journey_patterns.func())
