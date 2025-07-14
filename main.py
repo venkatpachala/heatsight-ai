@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import json
+import time
 
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -59,6 +60,22 @@ from heatsight_tools import (
 # --- END UPDATED IMPORTS ---
 
 load_dotenv()
+
+
+# Caching heavy CSV files to speed up repeated access
+@st.cache_data
+def load_final_insights():
+    return pd.read_csv("insights/final_product_insights.csv")
+
+
+@st.cache_data
+def load_movements():
+    return pd.read_csv("data/movements.csv")
+
+
+@st.cache_data
+def load_pos_sales():
+    return pd.read_csv("data/pos_sales.csv")
 
 st.set_page_config(
     layout="wide",
@@ -270,7 +287,7 @@ with tab1:
 
     try:
         # Corrected data path here as well if needed for dashboard display
-        final_insights_df = pd.read_csv("insights/final_product_insights.csv") 
+        final_insights_df = load_final_insights()
         hot_zones_count = final_insights_df[final_insights_df["Zone_Category"] == "Hot"]["Zone"].nunique()
         cold_zones_count = final_insights_df[final_insights_df["Zone_Category"] == "Cold"]["Zone"].nunique()
         col_kpi2.metric("Hot Zones 🔥", hot_zones_count, delta=f"{hot_zones_count/total_zones:.1%}")
@@ -305,7 +322,7 @@ with tab2:
 
     try:
         # Assuming movements.csv is still in 'data/'
-        movement_df = pd.read_csv("data/movements.csv") 
+        movement_df = load_movements()
         zone_counts = movement_df["Zone"].value_counts().to_dict()
 
         rows = [chr(ord('A') + i) for i in range(10)]
@@ -345,7 +362,7 @@ with tab4:
 
     try:
         # Corrected data path here as well for dashboard display
-        final_insights_df = pd.read_csv("insights/final_product_insights.csv") 
+        final_insights_df = load_final_insights()
         st.dataframe(final_insights_df)
 
         st.subheader("Zone Category Distribution")
@@ -433,6 +450,19 @@ with tab6:
         analyze_restock_needs,
         trigger_stock_alerts,
     ]
+
+    def profile_tool(tool):
+        original = tool.func
+        def wrapped(*args, **kwargs):
+            start = time.time()
+            result = original(*args, **kwargs)
+            duration = time.time() - start
+            print(f"TOOL {tool.name} executed in {duration:.2f}s")
+            return result
+        tool.func = wrapped
+        return tool
+
+    tools = [profile_tool(t) for t in tools]
     # --- END UPDATED TOOLS LIST ---
 
     try:
@@ -453,9 +483,9 @@ with tab6:
             ]
         )
 
-        conversational_memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+        conversational_memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, k=3)
         agent = create_tool_calling_agent(llm, tools, prompt)
-        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, memory=conversational_memory)
+        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, memory=conversational_memory).with_config({"timeout": 20})
 
         st.info("ShelfSense is ready to assist! Try asking: 'What are the top relocation recommendations?' or 'Tell me about product Formal Shirt Men.' You can also try: 'Record that Dettol was moved from A1 to B5 and sales increased by 10%.'")
 

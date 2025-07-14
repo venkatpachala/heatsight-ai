@@ -27,19 +27,25 @@ os.makedirs(AGENT_MEMORY_DIR, exist_ok=True)
 
 # --- Helper Functions for Data Loading ---
 
+_DATA_CACHE = {}
+
 def _load_df(file_path):
-    """General helper to load a DataFrame from a given CSV file path."""
+    """General helper to load a DataFrame from a given CSV file path with simple caching."""
+    if file_path in _DATA_CACHE:
+        return _DATA_CACHE[file_path]
+
     print(f"DEBUG: Attempting to load file: {file_path}")
     if not os.path.exists(file_path):
         print(f"ERROR: File NOT FOUND at expected path: {file_path}")
-        return pd.DataFrame() # Return empty DataFrame if file doesn't exist
+        return pd.DataFrame()
 
     if os.path.getsize(file_path) == 0:
         print(f"Warning: File is empty: {file_path}")
-        return pd.DataFrame() # Return empty DataFrame if file is empty
+        return pd.DataFrame()
 
     try:
         df = pd.read_csv(file_path)
+        _DATA_CACHE[file_path] = df
         print(f"DEBUG: Successfully loaded {file_path}. Shape: {df.shape}")
         if df.empty:
             print(f"DEBUG: DataFrame loaded from {file_path} is empty.")
