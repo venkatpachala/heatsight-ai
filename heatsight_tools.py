@@ -558,3 +558,91 @@ def get_real_time_placement_recommendation(event_context: str) -> str:
     except Exception as e:
         return f"Failed to generate real-time recommendation: {e}"
 
+
+@tool
+def get_zone_conversion_rate() -> str:
+    """Return conversion rate per zone using movements and POS sales."""
+    from conversion_rate_analysis import calculate_zone_conversion_rates
+    df = calculate_zone_conversion_rates()
+    if df.empty:
+        return "Conversion rate data unavailable."
+    lines = ["Zone conversion rates:"]
+    for _, r in df.iterrows():
+        lines.append(f"- {r['Zone']}: {r['Conversion_Rate']:.2f}")
+    return "\n".join(lines)
+
+
+@tool
+def get_declining_products() -> str:
+    """List products with declining sales velocity."""
+    from sales_velocity_tracker import identify_declines
+    df = identify_declines()
+    if df.empty:
+        return "No significant declines detected."
+    lines = ["Products with >20% decline:"]
+    for _, r in df.iterrows():
+        lines.append(f"- {r['Product_ID']} decline {r['Decline']:.1%}")
+    return "\n".join(lines)
+
+
+@tool
+def compare_dwell_time(zone_a: str, zone_b: str) -> str:
+    """Compare average dwell time between two zones."""
+    if not os.path.exists('data/dwell_time.csv'):
+        return "Dwell time data not available."
+    df = pd.read_csv('data/dwell_time.csv')
+    a = df[df['Zone'] == zone_a]['Avg_Dwell_Time'].mean()
+    b = df[df['Zone'] == zone_b]['Avg_Dwell_Time'].mean()
+    if pd.isna(a) or pd.isna(b):
+        return "One of the zones has no data."
+    return f"{zone_a}: {a:.1f}s vs {zone_b}: {b:.1f}s"
+
+
+@tool
+def get_complementary_products(product_name: str) -> str:
+    """Return complementary items from product_pairs.csv."""
+    from complementary_product_mapper import get_complementary
+    comps = get_complementary(product_name)
+    if not comps:
+        return "No complementary products found."
+    return "Complementary items: " + ", ".join(comps)
+
+
+@tool
+def recommend_product_placement() -> str:
+    """Recommend high revenue shelf spaces."""
+    from revenue_per_sqft_calculator import calculate_revenue_per_sqft
+    df = calculate_revenue_per_sqft()
+    if df.empty:
+        return "Unable to compute revenue per sqft."
+    top = df.sort_values('Revenue_per_sqft', ascending=False).head(3)
+    lines = ["Top zones by revenue per sqft:"]
+    for _, r in top.iterrows():
+        lines.append(f"- {r['Zone']} : {r['Revenue_per_sqft']:.2f}")
+    return "\n".join(lines)
+
+
+@tool
+def analyze_restock_needs() -> str:
+    """Analyze restock log for recent activity."""
+    path = os.path.join('data', 'restock_log.csv')
+    if not os.path.exists(path):
+        return "Restock log not found."
+    df = pd.read_csv(path)
+    recent = df.tail(3)
+    lines = ["Recent restocks:"]
+    for _, r in recent.iterrows():
+        lines.append(f"- {r['Product_ID']} at {r['Timestamp']}")
+    return "\n".join(lines)
+
+
+@tool
+def trigger_stock_alerts() -> str:
+    """Trigger stock alerts using stock_alerts module."""
+    try:
+        from stock_alerts import generate_stock_alerts
+        alerts = generate_stock_alerts()
+        return f"Generated {len(alerts)} stock alerts." if not alerts.empty else "No alerts."
+    except Exception as e:
+        return f"Failed to generate alerts: {e}"
+
