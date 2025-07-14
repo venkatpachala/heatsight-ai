@@ -38,6 +38,13 @@ from heatsight_tools import (
     run_what_if_placement,
     fetch_complementary_products,
     get_real_time_placement_recommendation,
+    get_zone_conversion_rate,
+    get_declining_products,
+    compare_dwell_time,
+    get_complementary_products,
+    recommend_product_placement,
+    analyze_restock_needs,
+    trigger_stock_alerts,
 )
 # --- END UPDATED IMPORTS ---
 
@@ -232,13 +239,14 @@ Welcome to HeatSight, an innovative solution for Walmart's Sparkathon! This plat
 </p>
 """, unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📊 Dashboard Overview",
     "🔥 In-Store Heatmap",
     "💵 POS Sales Heatmap",
     "📈 Omnichannel Insights",
     "🚚 Relocation Intelligence 🔥",
-    "🤖 ShelfSense Copilot"
+    "🤖 ShelfSense Copilot",
+    "🧠 Ask Anything"
 ])
 
 with tab1:
@@ -397,6 +405,13 @@ with tab6:
         run_what_if_placement,
         fetch_complementary_products,
         get_real_time_placement_recommendation,
+        get_zone_conversion_rate,
+        get_declining_products,
+        compare_dwell_time,
+        get_complementary_products,
+        recommend_product_placement,
+        analyze_restock_needs,
+        trigger_stock_alerts,
     ]
     # --- END UPDATED TOOLS LIST ---
 
@@ -462,4 +477,23 @@ with tab6:
 with tab3:
     st.header("POS Sales Heatmap")
     fig = generate_pos_sales_heatmap()
+
     st.pyplot(fig)
+
+with tab7:
+    st.header("🧠 Ask Anything")
+    query = st.text_input("Enter your question")
+    if query:
+        from nlp_query_router import classify_query
+        cat, kw = classify_query(query)
+        st.write(f"Category: {cat}")
+        if cat == 'performance':
+            st.write(get_zone_conversion_rate())
+        elif cat == 'behavior':
+            st.write(get_customer_journey_patterns())
+        elif cat == 'stock':
+            st.write(analyze_restock_needs())
+        elif cat == 'optimization':
+            st.write(recommend_product_placement())
+        else:
+            st.write("I'll need more context to answer that.")
