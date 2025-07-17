@@ -1,4 +1,4 @@
-# HeatSight: Smart Retail Optimization using AI
+# ShelfSense AI: Smart Retail Optimization using AI
 
 HeatSight is an intelligent retail heatmap + relocation engine that:
 - Visualizes in-store customer movement
